@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบสำรวจข้อมูลรถยนต์ รพ.บึงกาฬ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    :focus-visible {
+      outline: 2px solid #f97316;
+      outline-offset: 2px;
+    }
+    
+    .app-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .app-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .app-scroll::-webkit-scrollbar-thumb {
+      background-color: rgba(148, 163, 184, 0.9);
+      border-radius: 999px;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full w-full m-0 p-0">
+  <div id="app-root" class="h-full w-full"><!-- หน้าแบบฟอร์มสำรวจ -->
+   <div id="survey-page" class="h-full w-full bg-gradient-to-br from-sky-900 via-sky-800 to-blue-900">
+    <div class="h-full w-full max-w-4xl mx-auto px-4 py-6 md:py-8 app-scroll overflow-auto">
+     <header class="mb-6">
+      <div class="text-center">
+       <h1 id="main-title" class="text-white text-2xl md:text-4xl font-bold tracking-tight mb-3">แบบสำรวจข้อมูลรถยนต์ / รถจักรยานยนต์</h1>
+       <p id="subtitle-text" class="text-sky-100 text-sm md:text-base max-w-2xl mx-auto">เจ้าหน้าที่ โรงพยาบาลบึงกาฬ</p>
+      </div>
+     </header>
+     <main>
+      <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+       <form id="survey-form" class="space-y-6"><!-- ส่วนที่ 1: ข้อมูลเจ้าหน้าที่ -->
+        <section>
+         <h2 id="form-section-title-text" class="text-sky-900 text-xl md:text-2xl font-bold mb-4 pb-3 border-b-2 border-orange-400">ข้อมูลเจ้าหน้าที่</h2><!-- 1. คำนำหน้า -->
+         <div class="mb-4"><label for="prefix" class="block text-sm font-semibold text-sky-900 mb-2"> 1. คำนำหน้า <span class="text-red-500">*</span> </label> <select id="prefix" name="prefix" required class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-3 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400"> <option value="">-- เลือกคำนำหน้า --</option> <option value="นาย">นาย</option> <option value="นาง">นาง</option> <option value="นางสาว">นางสาว</option> <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option> </select>
+         </div><!-- ช่องระบุคำนำหน้าอื่นๆ -->
+         <div id="prefix-other-wrapper" class="mb-4 hidden"><label for="prefix_other" class="block text-sm font-semibold text-sky-900 mb-2"> โปรดระบุคำนำหน้า </label> <input id="prefix_other" name="prefix_other" type="text" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-3 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400" placeholder="ระบุคำนำหน้า เช่น ดร., ผศ.">
+         </div><!-- 2. ชื่อ - สกุล -->
+         <div class="mb-4"><label for="full_name" class="block text-sm font-semibold text-sky-900 mb-2"> 2. ชื่อ - สกุล <span class="text-red-500">*</span> </label> <input id="full_name" name="full_name" type="text" required class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-3 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400" placeholder="กรอกชื่อ - สกุล">
+         </div><!-- 3. ตำแหน่ง -->
+         <div class="mb-4"><label for="position" class="block text-sm font-semibold text-sky-900 mb-2"> 3. ตำแหน่ง <span class="text-red-500">*</span> </label> <input id="position" name="position" type="text" required class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-3 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400" placeholder="เช่น พยาบาลวิชาชีพ, แพทย์, เจ้าพนักงานธุรการ">
+         </div><!-- 4. กลุ่มงาน / งาน -->
+         <div class="mb-4"><label for="department" class="block text-sm font-semibold text-sky-900 mb-2"> 4. กลุ่มงาน / งาน <span class="text-red-500">*</span> </label> <select id="department" name="department" required class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-3 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400"> <option value="">-- เลือกกลุ่มงาน / งาน --</option> <option value="กลุ่มงานเวชศาสตร์ฉุกเฉิน">1 กลุ่มงานเวชศาสตร์ฉุกเฉิน</option> <option value="กลุ่มงานอายุรกรรม">2 กลุ่มงานอายุรกรรม</option> <option value="กลุ่มงานศัลยกรรม">3 กลุ่มงานศัลยกรรม</option> <option value="กลุ่มงานศัลยกรรมออร์โธปิดิกส์">4 กลุ่มงานศัลยกรรมออร์โธปิดิกส์</option> <option value="กลุ่มงานกุมารเวชกรรม">5 กลุ่มงานกุมารเวชกรรม</option> <option value="กลุ่มงานนิติเวช">6 กลุ่มงานนิติเวช</option> <option value="กลุ่มงานจักษุวิทยา">7 กลุ่มงานจักษุวิทยา</option> <option value="กลุ่มงานโสต ศอ นาสิก">8 กลุ่มงานโสต ศอ นาสิก</option> <option value="กลุ่มงานโภชนศาสตร์">9 กลุ่มงานโภชนศาสตร์</option> <option value="กลุ่มงานพยาธิวิทยากายวิภาค">10 กลุ่มงานพยาธิวิทยากายวิภาค</option> <option value="กลุ่มงานสูติ-นรีเวชกรรม">11 กลุ่มงานสูติ-นรีเวชกรรม</option> <option value="กลุ่มงานวิสัญญีวิทยา">12 กลุ่มงานวิสัญญีวิทยา</option> <option value="กลุ่มงานจิตเวชและยาเสพติด">13 กลุ่มงานจิตเวชและยาเสพติด</option> <option value="กลุ่มงานรังสีวิทยา">14 กลุ่มงานรังสีวิทยา</option> <option value="กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก">15 กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก</option> <option value="กลุ่มงานเวชกรรมฟื้นฟู">16 กลุ่มงานเวชกรรมฟื้นฟู</option> <option value="กลุ่มงานสังคมสงเคราะห์">17 กลุ่มงานสังคมสงเคราะห์</option> <option value="กลุ่มงานเภสัชกรรม">18 กลุ่มงานเภสัชกรรม</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยอุบัติเหตุและฉุกเฉิน">19 กลุ่มงานการพยาบาลผู้ป่วยอุบัติเหตุและฉุกเฉิน</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยนอก">20 กลุ่มงานการพยาบาลผู้ป่วยนอก</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยหนัก">21 กลุ่มงานการพยาบาลผู้ป่วยหนัก</option> <option value="กลุ่มงานการพยาบาลผู้คลอด">22 กลุ่มงานการพยาบาลผู้คลอด</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยห้องผ่าตัด">23 กลุ่มงานการพยาบาลผู้ป่วยห้องผ่าตัด</option> <option value="กลุ่มงานการพยาบาลวิสัญญี">24 กลุ่มงานการพยาบาลวิสัญญี</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยอายุรกรรม">25 กลุ่มงานการพยาบาลผู้ป่วยอายุรกรรม</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยศัลยกรรม">26 กลุ่มงานการพยาบาลผู้ป่วยศัลยกรรม</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยสูติ-นรีเวช">27 กลุ่มงานการพยาบาลผู้ป่วยสูติ-นรีเวช</option> <option value="กลุ่มงานการพยาบาลจิตเวช">28 กลุ่มงานการพยาบาลจิตเวช</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยกุมารเวชกรรม">29 กลุ่มงานการพยาบาลผู้ป่วยกุมารเวชกรรม</option> <option value="กลุ่มงานการพยาบาลผู้ป่วยออร์โธปิดิกส์">30 กลุ่มงานการพยาบาลผู้ป่วยออร์โธปิดิกส์</option> <option value="กลุ่มงานการพยาบาลผู้ป่วย โสต ศอ นาสิก จักษุ">31 กลุ่มงานการพยาบาลผู้ป่วย โสต ศอ นาสิก จักษุ</option> <option value="กลุ่มงานการพยาบาลด้านการควบคุมและป้องกันการติดเชื้อ">32 กลุ่มงานการพยาบาลด้านการควบคุมและป้องกันการติดเชื้อ</option> <option value="กลุ่มงานการพยาบาลตรวจรักษาพิเศษ">33 กลุ่มงานการพยาบาลตรวจรักษาพิเศษ</option> <option value="กลุ่มงานวิจัยและพัฒนาการพยาบาล">34 กลุ่มงานวิจัยและพัฒนาการพยาบาล</option> <option value="กลุ่มงานประกันสุขภาพ">35 กลุ่มงานประกันสุขภาพ</option> <option value="กลุ่มงานยุทธศาสตร์และแผนงานโครงการ">36 กลุ่มงานยุทธศาสตร์และแผนงานโครงการ</option> <option value="กลุ่มงานพัฒนาทรัพยากรบุคคล">37 กลุ่มงานพัฒนาทรัพยากรบุคคล</option> <option value="กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน">38 กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน</option> <option value="กลุ่มงานบริหารงานทั่วไป">39 กลุ่มงานบริหารงานทั่วไป</option> <option value="กลุ่มงานพัสดุ">40 กลุ่มงานพัสดุ</option> <option value="กลุ่มงานบัญชี">41 กลุ่มงานบัญชี</option> <option value="กลุ่มงานการเงิน">42 กลุ่มงานการเงิน</option> <option value="กลุ่มงานทรัพยากรบุคคล">43 กลุ่มงานทรัพยากรบุคคล</option> <option value="กลุ่มงานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์">44 กลุ่มงานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์</option> <option value="กลุ่มงานเทคโนโลยีสารสนเทศ">45 กลุ่มงานเทคโนโลยีสารสนเทศ</option> <option value="กลุ่มงานสุขภาพดิจิทัล">46 กลุ่มงานสุขภาพดิจิทัล</option> <option value="กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์">47 กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์</option> <option value="กลุ่มงานบริการทันตกรรมปฐมภูมิและทุติยภูมิ">48 กลุ่มงานบริการทันตกรรมปฐมภูมิและทุติยภูมิ</option> <option value="กลุ่มงานบริการทันตกรรมตติยภูมิและศูนย์ความเป็นเลิศ">49 กลุ่มงานบริการทันตกรรมตติยภูมิและศูนย์ความเป็นเลิศ</option> <option value="กลุ่มงานพัฒนาคุณภาพบริการและวิชาการทันตกรรม">50 กลุ่มงานพัฒนาคุณภาพบริการและวิชาการทันตกรรม</option> <option value="กลุ่มงานผู้ป่วยนอก">51 กลุ่มงานผู้ป่วยนอก</option> <option value="กลุ่มงานการแพทย์แผนไทยและการแพทย์ทางเลือก">52 กลุ่มงานการแพทย์แผนไทยและการแพทย์ทางเลือก</option> <option value="กลุ่มงานเวชกรรมสังคม">53 กลุ่มงานเวชกรรมสังคม</option> <option value="กลุ่มงานสุขศึกษา">54 กลุ่มงานสุขศึกษา</option> <option value="กลุ่มงานอาชีวเวชกรรม">55 กลุ่มงานอาชีวเวชกรรม</option> <option value="กลุ่มงานการพยาบาลชุมชน">56 กลุ่มงานการพยาบาลชุมชน</option> <option value="กลุ่มงานการพยาบาล">57 กลุ่มการพยาบาล</option> <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option> </select>
+         </div><!-- ช่องระบุกลุ่มงานอื่นๆ -->
+         <div id="department-other-wrapper" class="mb-4 hidden"><label for="department_other" class="block text-sm font-semibold text-sky-900 mb-2"> โปรดระบุกลุ่มงาน / งาน </label> <input id="department_other" name="department_other" type="text" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-3 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400" placeholder="ระบุกลุ่มงาน / งาน">
+         </div>
+        </section><!-- ส่วนที่ 2: ข้อมูลรถยนต์ / รถจักรยานยนต์ -->
+        <section class="pt-6 border-t-2 border-sky-100">
+         <h2 id="vehicle-section-title-text" class="text-sky-900 text-xl md:text-2xl font-bold mb-4 pb-3 border-b-2 border-orange-400">ข้อมูลรถยนต์ / รถจักรยานยนต์</h2>
+         <div class="mb-4 bg-sky-50 rounded-lg p-4 text-sm text-sky-800">
+          <p class="font-medium">📋 คำแนะนำ:</p>
+          <ul class="list-disc list-inside mt-2 space-y-1 text-xs">
+           <li>สามารถเพิ่มรายการรถได้หลายคัน</li>
+           <li>กรุณากรอกข้อมูลให้ครบทั้ง 4 ข้อ: ประเภทรถ, ยี่ห้อ, รุ่น, และเลขทะเบียน</li>
+           <li>ระบุเลขทะเบียนรถให้ชัดเจนและถูกต้อง</li>
+          </ul>
+         </div>
+         <div id="vehicle-list" class="space-y-4 mb-4"></div>
+         <div class="flex items-center justify-between gap-3 flex-wrap"><button type="button" id="add-vehicle-btn" class="inline-flex items-center gap-2 rounded-lg bg-sky-700 text-white px-4 py-2.5 text-sm font-semibold hover:bg-sky-800 transition-colors shadow-md">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+           </svg> เพิ่มรายการรถ </button>
+          <p class="text-sm text-sky-700 font-medium">จำนวนรถทั้งหมด: <span id="vehicle-count" class="text-lg font-bold text-orange-500">0</span> คัน</p>
+         </div>
+        </section><!-- ปุ่มส่งข้อมูล -->
+        <div class="pt-6 border-t-2 border-sky-100">
+         <div id="form-message" class="mb-4 text-sm text-center min-h-[1.5rem]"></div>
+         <div class="flex flex-col sm:flex-row gap-3 justify-center"><button type="submit" id="submit-btn" class="inline-flex items-center justify-center gap-2 rounded-lg bg-orange-500 text-white px-8 py-3.5 text-base font-bold hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"> <span id="submit-btn-text">บันทึกข้อมูล</span> </button> <button type="button" id="reset-btn" class="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-sky-300 bg-white text-sky-900 px-8 py-3.5 text-base font-semibold hover:bg-sky-50 transition-colors"> ล้างฟอร์ม </button>
+         </div>
+        </div>
+       </form><!-- ลิงก์ไปหน้าแอดมิน -->
+       <div class="mt-8 pt-6 border-t-2 border-sky-100 text-center"><button id="go-to-admin-btn" class="inline-flex items-center gap-2 text-sky-700 hover:text-sky-900 text-sm font-medium hover:underline">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+         </svg> เข้าสู่ระบบแอดมิน </button>
+       </div>
+      </div>
+     </main>
+     <footer class="mt-6 text-center text-sky-100 text-xs space-y-2">
+      <p class="font-medium">ติดต่อสอบถามข้อมูลเพิ่มเติม ได้ที่ งานธุรการ กลุ่มงานบริหารทั่วไป โทร 202</p>
+      <p>ข้อมูลถูกเก็บเป็นความลับและใช้เพื่อการบริหารจัดการภายในเท่านั้น</p>
+      <p class="pt-2 border-t border-sky-700">พัฒนาโดย วรวัฒธ์ บุษราคำ</p>
+     </footer>
+    </div>
+   </div><!-- หน้าเข้าสู่ระบบแอดมิน -->
+   <div id="login-page" class="h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 hidden">
+    <div class="h-full w-full flex items-center justify-center px-4">
+     <div class="w-full max-w-md">
+      <div class="bg-white rounded-2xl shadow-2xl p-8">
+       <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mb-4">
+         <svg class="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+         </svg>
+        </div>
+        <h1 id="admin-login-title-text" class="text-2xl font-bold text-slate-900 mb-2">เข้าสู่ระบบแอดมิน</h1>
+        <p class="text-sm text-slate-600">กรุณาใช้รหัสผ่านเพื่อเข้าสู่ระบบจัดการข้อมูล</p>
+       </div>
+       <form id="login-form" class="space-y-4">
+        <div><label for="admin-password" class="block text-sm font-semibold text-slate-900 mb-2"> รหัสผ่าน </label> <input id="admin-password" name="admin-password" type="password" required class="w-full rounded-lg border-2 border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400" placeholder="กรอกรหัสผ่าน">
+        </div>
+        <div id="login-message" class="text-sm text-center min-h-[1.5rem]"></div><button type="submit" class="w-full rounded-lg bg-orange-500 text-white px-6 py-3 text-base font-bold hover:bg-orange-600 transition-colors shadow-lg"> เข้าสู่ระบบ </button> <button type="button" id="back-to-survey-btn" class="w-full rounded-lg border-2 border-slate-300 bg-white text-slate-700 px-6 py-3 text-base font-semibold hover:bg-slate-50 transition-colors"> กลับไปหน้าแบบสำรวจ </button>
+       </form>
+      </div>
+     </div>
+    </div>
+   </div><!-- หน้าแอดมิน -->
+   <div id="admin-page" class="h-full w-full bg-slate-50 hidden">
+    <div class="h-full w-full flex flex-col"><!-- Header -->
+     <header class="bg-gradient-to-r from-sky-900 to-blue-900 text-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 py-4 md:py-6">
+       <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+         <h1 class="text-xl md:text-2xl font-bold">ระบบจัดการข้อมูลรถ</h1>
+         <p class="text-sm text-sky-100 mt-1">โรงพยาบาลบึงกาฬ</p>
+        </div>
+        <div class="flex items-center gap-3"><button id="logout-btn" class="inline-flex items-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 text-white px-4 py-2 text-sm font-medium transition-colors border border-white/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg> ออกจากระบบ </button>
+        </div>
+       </div>
+      </div>
+     </header><!-- Content -->
+     <main class="flex-1 overflow-auto app-scroll">
+      <div class="max-w-7xl mx-auto px-4 py-6"><!-- สถิติรวม -->
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+         <div class="flex items-center justify-between">
+          <div>
+           <p class="text-sm text-slate-600 font-medium">จำนวนเจ้าหน้าที่ทั้งหมด</p>
+           <p id="total-staff" class="text-3xl font-bold text-slate-900 mt-1">0</p>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+           <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+           </svg>
+          </div>
+         </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-sky-500">
+         <div class="flex items-center justify-between">
+          <div>
+           <p class="text-sm text-slate-600 font-medium">จำนวนรถทั้งหมด</p>
+           <p id="total-vehicles-admin" class="text-3xl font-bold text-slate-900 mt-1">0</p>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center">
+           <svg class="w-6 h-6 text-sky-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+           </svg>
+          </div>
+         </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-emerald-500">
+         <div class="flex items-center justify-between">
+          <div>
+           <p class="text-sm text-slate-600 font-medium">จำนวนกลุ่มงาน</p>
+           <p id="total-departments" class="text-3xl font-bold text-slate-900 mt-1">0</p>
+          </div>
+          <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+           <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+           </svg>
+          </div>
+         </div>
+        </div>
+       </div><!-- ตัวกรองและค้นหา -->
+       <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 class="text-lg font-bold text-slate-900 mb-4">🔍 ค้นหาและกรองข้อมูล</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div><label for="search-input" class="block text-sm font-semibold text-slate-700 mb-2"> ค้นหาชื่อ-สกุล หรือเลขทะเบียน </label> <input id="search-input" type="text" class="w-full rounded-lg border-2 border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400" placeholder="พิมพ์เพื่อค้นหา...">
+         </div>
+         <div><label for="department-filter" class="block text-sm font-semibold text-slate-700 mb-2"> กรองตามกลุ่มงาน </label> <select id="department-filter" class="w-full rounded-lg border-2 border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400"> <option value="">แสดงทุกกลุ่มงาน</option> </select>
+         </div>
+        </div>
+        <div class="mt-4 flex items-center justify-between text-sm text-slate-600">
+         <p>แสดงผลลัพธ์: <span id="filtered-count" class="font-bold text-slate-900">0</span> รายการ</p><button id="clear-filter-btn" class="text-orange-500 hover:text-orange-600 font-medium hover:underline"> ล้างตัวกรอง </button>
+        </div>
+       </div><!-- คำเตือนขีดจำกัด -->
+       <div id="limit-warning-admin" class="hidden mb-6 rounded-xl border-2 border-orange-300 bg-orange-50 px-6 py-4">
+        <div class="flex items-start gap-3">
+         <svg class="w-6 h-6 text-orange-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+         </svg>
+         <div>
+          <p class="font-bold text-orange-800">ถึงขีดจำกัดการเก็บข้อมูล</p>
+          <p class="text-sm text-orange-700 mt-1">จำนวนข้อมูลถึง 999 รายการแล้ว กรุณาลบข้อมูลเก่าออกก่อนเพิ่มรายการใหม่</p>
+         </div>
+        </div>
+       </div><!-- รายการข้อมูล -->
+       <div id="admin-data-list" class="space-y-4">
+        <div class="text-center py-12 text-slate-500">
+         <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+         </svg>
+         <p class="text-lg font-medium">ยังไม่มีข้อมูลในระบบ</p>
+         <p class="text-sm mt-2">ข้อมูลจะแสดงที่นี่หลังจากมีการบันทึกจากแบบฟอร์ม</p>
+        </div>
+       </div>
+      </div>
+     </main>
+    </div>
+   </div>
+  </div>
+  <script>
+    // ========== CONFIG & ELEMENT SDK ==========
+    const defaultConfig = {
+      main_title: "แบบสำรวจข้อมูลรถยนต์ / รถจักรยานยนต์",
+      subtitle: "เจ้าหน้าที่ โรงพยาบาลบึงกาฬ",
+      form_section_title: "ข้อมูลเจ้าหน้าที่",
+      vehicle_section_title: "ข้อมูลรถยนต์ / รถจักรยานยนต์",
+      submit_button_text: "บันทึกข้อมูล",
+      admin_login_title: "เข้าสู่ระบบแอดมิน",
+      background_color: "#0c4a6e",
+      surface_color: "#ffffff",
+      text_color: "#0f172a",
+      primary_action_color: "#f97316",
+      secondary_action_color: "#0369a1",
+      font_family: "Sarabun",
+      font_size: 14
+    };
+
+    let currentDataRecords = [];
+    let isLoggedIn = false;
+    const ADMIN_PASSWORD = "BKH1234";
+
+    function applyConfigToUI(config) {
+      const cfg = { ...defaultConfig, ...config };
+      const baseFont = cfg.font_family;
+      const baseSize = Number(cfg.font_size);
+      const fontStack = `${baseFont}, system-ui, -apple-system, sans-serif`;
+
+      // Apply text content
+      const mainTitle = document.getElementById("main-title");
+      const subtitleText = document.getElementById("subtitle-text");
+      const formSectionTitle = document.getElementById("form-section-title-text");
+      const vehicleSectionTitle = document.getElementById("vehicle-section-title-text");
+      const submitBtnText = document.getElementById("submit-btn-text");
+      const adminLoginTitle = document.getElementById("admin-login-title-text");
+
+      if (mainTitle) mainTitle.textContent = cfg.main_title;
+      if (subtitleText) subtitleText.textContent = cfg.subtitle;
+      if (formSectionTitle) formSectionTitle.textContent = cfg.form_section_title;
+      if (vehicleSectionTitle) vehicleSectionTitle.textContent = cfg.vehicle_section_title;
+      if (submitBtnText) submitBtnText.textContent = cfg.submit_button_text;
+      if (adminLoginTitle) adminLoginTitle.textContent = cfg.admin_login_title;
+
+      // Apply colors
+      const surveyPage = document.getElementById("survey-page");
+      if (surveyPage) {
+        surveyPage.style.background = `linear-gradient(to bottom right, ${cfg.background_color}, ${cfg.secondary_action_color})`;
+      }
+
+      const submitBtn = document.getElementById("submit-btn");
+      if (submitBtn) {
+        submitBtn.style.backgroundColor = cfg.primary_action_color;
+      }
+
+      // Apply fonts
+      document.body.style.fontFamily = fontStack;
+      
+      const headings = document.querySelectorAll("h1, h2, h3");
+      headings.forEach(el => {
+        el.style.fontFamily = fontStack;
+      });
+
+      if (mainTitle) mainTitle.style.fontSize = `${baseSize * 2}px`;
+      if (subtitleText) subtitleText.style.fontSize = `${baseSize * 1.1}px`;
+      
+      const sectionTitles = document.querySelectorAll("h2");
+      sectionTitles.forEach(el => {
+        el.style.fontSize = `${baseSize * 1.5}px`;
+      });
+
+      const labels = document.querySelectorAll("label");
+      labels.forEach(el => {
+        el.style.fontSize = `${baseSize * 0.95}px`;
+      });
+
+      const inputs = document.querySelectorAll("input, select, textarea");
+      inputs.forEach(el => {
+        el.style.fontSize = `${baseSize}px`;
+      });
+
+      const buttons = document.querySelectorAll("button");
+      buttons.forEach(el => {
+        el.style.fontSize = `${baseSize}px`;
+      });
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          applyConfigToUI(config);
+        },
+        mapToCapabilities: (config) => {
+          const cfg = { ...defaultConfig, ...config };
+          return {
+            recolorables: [
+              {
+                get: () => cfg.background_color,
+                set: (value) => {
+                  cfg.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => cfg.surface_color,
+                set: (value) => {
+                  cfg.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              },
+              {
+                get: () => cfg.text_color,
+                set: (value) => {
+                  cfg.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => cfg.primary_action_color,
+                set: (value) => {
+                  cfg.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              },
+              {
+                get: () => cfg.secondary_action_color,
+                set: (value) => {
+                  cfg.secondary_action_color = value;
+                  window.elementSdk.setConfig({ secondary_action_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => cfg.font_family,
+              set: (value) => {
+                cfg.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => Number(cfg.font_size),
+              set: (value) => {
+                cfg.font_size = Number(value);
+                window.elementSdk.setConfig({ font_size: Number(value) });
+              }
+            }
+          };
+        },
+        mapToEditPanelValues: (config) => {
+          const cfg = { ...defaultConfig, ...config };
+          return new Map([
+            ["main_title", cfg.main_title],
+            ["subtitle", cfg.subtitle],
+            ["form_section_title", cfg.form_section_title],
+            ["vehicle_section_title", cfg.vehicle_section_title],
+            ["submit_button_text", cfg.submit_button_text],
+            ["admin_login_title", cfg.admin_login_title]
+          ]);
+        }
+      });
+      applyConfigToUI(window.elementSdk.config);
+    } else {
+      applyConfigToUI(defaultConfig);
+    }
+
+    // ========== DATA SDK ==========
+    let dataSdkInitialized = false;
+    let isCreating = false;
+
+    const dataHandler = {
+      onDataChanged(data) {
+        currentDataRecords = data || [];
+        if (isLoggedIn) {
+          renderAdminData();
+        }
+      }
+    };
+
+    async function initDataSdk() {
+      if (!window.dataSdk || dataSdkInitialized) return;
+      const result = await window.dataSdk.init(dataHandler);
+      if (result.isOk) {
+        dataSdkInitialized = true;
+      } else {
+        showMessage("ไม่สามารถเชื่อมต่อระบบจัดเก็บข้อมูลได้", "error");
+      }
+    }
+
+    initDataSdk();
+
+    // ========== VEHICLE LIST UI ==========
+    let vehicleCounter = 0;
+
+    function createVehicleRow() {
+      vehicleCounter++;
+      const wrapper = document.createElement("div");
+      wrapper.className = "rounded-xl border-2 border-sky-200 bg-sky-50 p-4";
+      wrapper.dataset.vehicleId = vehicleCounter;
+
+      wrapper.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-sky-900">🚗 รายการรถที่ ${vehicleCounter}</h3>
+          <button type="button" class="remove-vehicle-btn text-xs text-red-600 hover:text-red-800 font-medium hover:underline">
+            ลบรายการนี้
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-sky-900 mb-1">1. ประเภทรถ <span class="text-red-500">*</span></label>
+            <select class="vehicle-type w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400">
+              <option value="">เลือกประเภทรถ</option>
+              <option value="รถยนต์">รถยนต์</option>
+              <option value="รถจักรยานยนต์">รถจักรยานยนต์</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-sky-900 mb-1">2. ยี่ห้อ <span class="text-red-500">*</span></label>
+            <input type="text" class="vehicle-brand w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400"
+              placeholder="เช่น Toyota, Honda, Yamaha" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-sky-900 mb-1">3. รุ่น <span class="text-red-500">*</span></label>
+            <input type="text" class="vehicle-model w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400"
+              placeholder="เช่น Vios, City, Wave" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-sky-900 mb-1">4. เลขทะเบียน <span class="text-red-500">*</span></label>
+            <input type="text" class="vehicle-plate w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400"
+              placeholder="เช่น กข-1234 บึงกาฬ" />
+          </div>
+        </div>
+      `;
+
+      wrapper.querySelector(".remove-vehicle-btn").addEventListener("click", () => {
+        wrapper.remove();
+        updateVehicleCount();
+      });
+
+      return wrapper;
+    }
+
+    function updateVehicleCount() {
+      const list = document.getElementById("vehicle-list");
+      const count = list ? list.querySelectorAll("[data-vehicle-id]").length : 0;
+      const countEl = document.getElementById("vehicle-count");
+      if (countEl) countEl.textContent = count;
+    }
+
+    function addVehicleRow() {
+      const list = document.getElementById("vehicle-list");
+      if (!list) return;
+      const row = createVehicleRow();
+      list.appendChild(row);
+      updateVehicleCount();
+    }
+
+    function getVehicleData() {
+      const list = document.getElementById("vehicle-list");
+      if (!list) return [];
+      
+      const rows = list.querySelectorAll("[data-vehicle-id]");
+      const vehicles = [];
+      
+      rows.forEach((row, index) => {
+        const type = row.querySelector(".vehicle-type")?.value.trim() || "";
+        const brand = row.querySelector(".vehicle-brand")?.value.trim() || "";
+        const model = row.querySelector(".vehicle-model")?.value.trim() || "";
+        const plate = row.querySelector(".vehicle-plate")?.value.trim() || "";
+        
+        if (type || brand || model || plate) {
+          vehicles.push({
+            index: index + 1,
+            type,
+            brand,
+            model,
+            plate
+          });
+        }
+      });
+      
+      return vehicles;
+    }
+
+    // ========== FORM HANDLING ==========
+    function showMessage(text, type) {
+      const msgEl = document.getElementById("form-message");
+      if (!msgEl) return;
+      
+      msgEl.textContent = text;
+      msgEl.className = "mb-4 text-sm text-center min-h-[1.5rem]";
+      
+      if (type === "success") {
+        msgEl.classList.add("text-emerald-600", "font-semibold");
+      } else if (type === "error") {
+        msgEl.classList.add("text-red-600", "font-semibold");
+      } else {
+        msgEl.classList.add("text-sky-700");
+      }
+    }
+
+    function resetForm() {
+      const form = document.getElementById("survey-form");
+      if (form) form.reset();
+      
+      const list = document.getElementById("vehicle-list");
+      if (list) list.innerHTML = "";
+      
+      vehicleCounter = 0;
+      addVehicleRow();
+      
+      document.getElementById("prefix-other-wrapper")?.classList.add("hidden");
+      document.getElementById("department-other-wrapper")?.classList.add("hidden");
+      
+      showMessage("", "");
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      
+      if (isCreating) return;
+
+      const prefix = document.getElementById("prefix")?.value.trim() || "";
+      const prefixOther = document.getElementById("prefix_other")?.value.trim() || "";
+      const fullName = document.getElementById("full_name")?.value.trim() || "";
+      const position = document.getElementById("position")?.value.trim() || "";
+      const department = document.getElementById("department")?.value.trim() || "";
+      const departmentOther = document.getElementById("department_other")?.value.trim() || "";
+
+      if (!prefix || !fullName || !position || !department) {
+        showMessage("❌ กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+        return;
+      }
+
+      if (prefix === "อื่นๆ" && !prefixOther) {
+        showMessage("❌ กรุณาระบุคำนำหน้า", "error");
+        return;
+      }
+
+      if (department === "อื่นๆ" && !departmentOther) {
+        showMessage("❌ กรุณาระบุกลุ่มงาน / งาน", "error");
+        return;
+      }
+
+      const vehicles = getVehicleData();
+      if (vehicles.length === 0) {
+        showMessage("❌ กรุณาเพิ่มอย่างน้อย 1 รายการรถ", "error");
+        return;
+      }
+
+      // ตรวจสอบว่ากรอกข้อมูลรถครบถ้วน
+      for (let i = 0; i < vehicles.length; i++) {
+        const v = vehicles[i];
+        if (!v.type || !v.brand || !v.model || !v.plate) {
+          showMessage(`❌ กรุณากรอกข้อมูลรถให้ครบถ้วนในรายการที่ ${i + 1}`, "error");
+          return;
+        }
+      }
+
+      // ตรวจสอบทะเบียนซ้ำในฟอร์มปัจจุบัน
+      const plateNumbers = vehicles.map(v => v.plate.trim().toLowerCase());
+      const duplicatesInForm = plateNumbers.filter((plate, index) => plateNumbers.indexOf(plate) !== index);
+      if (duplicatesInForm.length > 0) {
+        showMessage(`❌ พบเลขทะเบียนซ้ำในฟอร์ม: ${duplicatesInForm.join(", ")}`, "error");
+        return;
+      }
+
+      // ตรวจสอบทะเบียนซ้ำกับข้อมูลในระบบ
+      const existingPlates = [];
+      for (const record of currentDataRecords) {
+        try {
+          const recordVehicles = JSON.parse(record.vehicle_list_json || "[]");
+          recordVehicles.forEach(v => {
+            if (v.plate) {
+              existingPlates.push({
+                plate: v.plate.trim().toLowerCase(),
+                owner: `${record.prefix || ""} ${record.full_name || ""}`,
+                department: record.department || "",
+                type: v.type || "",
+                brand: v.brand || "",
+                model: v.model || ""
+              });
+            }
+          });
+        } catch (e) {
+          // Skip invalid records
+        }
+      }
+
+      const duplicates = [];
+      for (const vehicle of vehicles) {
+        const plateLower = vehicle.plate.trim().toLowerCase();
+        const existing = existingPlates.find(ep => ep.plate === plateLower);
+        if (existing) {
+          duplicates.push({
+            plate: vehicle.plate,
+            owner: existing.owner,
+            department: existing.department,
+            type: existing.type,
+            brand: existing.brand,
+            model: existing.model
+          });
+        }
+      }
+
+      if (duplicates.length > 0) {
+        showDuplicatePlateWarning(duplicates);
+        return;
+      }
+
+      if (!window.dataSdk || !dataSdkInitialized) {
+        showMessage("❌ ระบบยังไม่พร้อม กรุณาลองใหม่", "error");
+        return;
+      }
+
+      if (currentDataRecords.length >= 999) {
+        showMessage("❌ ไม่สามารถเพิ่มข้อมูลได้ ถึงขีดจำกัด 999 รายการแล้ว", "error");
+        return;
+      }
+
+      const finalPrefix = prefix === "อื่นๆ" ? prefixOther : prefix;
+      const finalDepartment = department === "อื่นๆ" ? departmentOther : department;
+
+      // แสดงป๊อบอัพยืนยันข้อมูล
+      showConfirmationPopup(finalPrefix, fullName, position, finalDepartment, vehicles, prefixOther, departmentOther);
+    }
+
+    function showDuplicatePlateWarning(duplicates) {
+      const warningModal = document.createElement("div");
+      warningModal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4 overflow-auto";
+      
+      let duplicateListHTML = duplicates.map((dup, i) => `
+        <div class="bg-red-50 rounded-lg p-4 border-2 border-red-200">
+          <div class="flex items-start gap-3">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-500 text-white font-bold flex-shrink-0">
+              ${i + 1}
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-red-900 text-lg mb-2">🚗 ${dup.plate}</div>
+              <div class="space-y-1 text-sm text-red-800">
+                <div><span class="font-semibold">เจ้าของ:</span> ${dup.owner}</div>
+                <div><span class="font-semibold">กลุ่มงาน:</span> ${dup.department}</div>
+                <div><span class="font-semibold">ประเภท:</span> ${dup.type}</div>
+                <div><span class="font-semibold">ยี่ห้อ:</span> ${dup.brand}</div>
+                <div><span class="font-semibold">รุ่น:</span> ${dup.model}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      warningModal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl w-full my-8">
+          <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-red-900 mb-2">⚠️ พบเลขทะเบียนซ้ำในระบบ</h3>
+            <p class="text-sm text-slate-600">เลขทะเบียนรถที่คุณกรอกมีอยู่ในระบบแล้ว กรุณาตรวจสอบข้อมูล</p>
+          </div>
+
+          <div class="space-y-4 max-h-[60vh] overflow-auto app-scroll pr-2">
+            <div class="bg-orange-50 rounded-xl p-5 border-2 border-orange-200 mb-4">
+              <div class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div class="flex-1">
+                  <p class="font-bold text-orange-900 mb-1">ข้อมูลที่ซ้ำกัน (${duplicates.length} รายการ)</p>
+                  <p class="text-sm text-orange-800">หากต้องการแก้ไขข้อมูล กรุณาติดต่อเจ้าหน้าที่หรือใช้ระบบแอดมิน</p>
+                </div>
+              </div>
+            </div>
+
+            ${duplicateListHTML}
+          </div>
+
+          <div class="flex justify-center mt-6 pt-6 border-t-2 border-slate-200">
+            <button type="button" id="close-duplicate-warning" class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-600 text-white px-8 py-3.5 text-base font-bold hover:bg-slate-700 transition-colors shadow-lg">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              ปิด
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(warningModal);
+
+      const closeBtn = warningModal.querySelector("#close-duplicate-warning");
+      closeBtn?.addEventListener("click", () => {
+        warningModal.remove();
+      });
+    }
+
+    function showConfirmationPopup(prefix, fullName, position, department, vehicles, prefixOther, departmentOther) {
+      const confirmModal = document.createElement("div");
+      confirmModal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4 overflow-auto";
+      
+      let vehicleListHTML = vehicles.map((v, i) => `
+        <div class="flex items-start gap-2 text-sm">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-400 text-white text-xs flex-shrink-0 mt-0.5">${i + 1}</span>
+          <div class="flex-1">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+              <div><span class="font-semibold text-sky-900">ประเภท:</span> <span class="text-slate-700">${v.type}</span></div>
+              <div><span class="font-semibold text-sky-900">ยี่ห้อ:</span> <span class="text-slate-700">${v.brand}</span></div>
+              <div><span class="font-semibold text-sky-900">รุ่น:</span> <span class="text-slate-700">${v.model}</span></div>
+              <div><span class="font-semibold text-sky-900">ทะเบียน:</span> <span class="text-slate-700">${v.plate}</span></div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      confirmModal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-2xl w-full my-8">
+          <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mb-4">
+              <svg class="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">ยืนยันข้อมูล</h3>
+            <p class="text-sm text-slate-600">กรุณาตรวจสอบความถูกต้องของข้อมูลก่อนบันทึก</p>
+          </div>
+
+          <div class="space-y-6 max-h-[60vh] overflow-auto app-scroll pr-2">
+            <!-- ข้อมูลเจ้าหน้าที่ -->
+            <div class="bg-sky-50 rounded-xl p-5 border-2 border-sky-200">
+              <h4 class="text-lg font-bold text-sky-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                ข้อมูลเจ้าหน้าที่
+              </h4>
+              <div class="space-y-3">
+                <div class="flex items-start">
+                  <span class="text-sm font-semibold text-sky-900 w-32 flex-shrink-0">ชื่อ-สกุล:</span>
+                  <span class="text-sm text-slate-700 flex-1">${prefix} ${fullName}</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-sm font-semibold text-sky-900 w-32 flex-shrink-0">ตำแหน่ง:</span>
+                  <span class="text-sm text-slate-700 flex-1">${position}</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-sm font-semibold text-sky-900 w-32 flex-shrink-0">กลุ่มงาน/งาน:</span>
+                  <span class="text-sm text-slate-700 flex-1">${department}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ข้อมูลรถยนต์ -->
+            <div class="bg-orange-50 rounded-xl p-5 border-2 border-orange-200">
+              <h4 class="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                ข้อมูลรถยนต์ / รถจักรยานยนต์ (${vehicles.length} คัน)
+              </h4>
+              <div class="space-y-4">
+                ${vehicleListHTML}
+              </div>
+            </div>
+          </div>
+
+          <div id="confirm-message" class="mt-4 text-sm text-center min-h-[1.5rem]"></div>
+
+          <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t-2 border-slate-200">
+            <button type="button" id="confirm-save-btn" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 text-white px-6 py-3.5 text-base font-bold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-lg">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span id="confirm-save-text">ยืนยันและบันทึก</span>
+              <span id="confirm-save-loading" class="hidden">
+                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            </button>
+            <button type="button" id="cancel-save-btn" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-slate-300 bg-white text-slate-700 px-6 py-3.5 text-base font-semibold hover:bg-slate-50 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              แก้ไขข้อมูล
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(confirmModal);
+
+      const cancelBtn = confirmModal.querySelector("#cancel-save-btn");
+      cancelBtn?.addEventListener("click", () => {
+        confirmModal.remove();
+      });
+
+      const confirmBtn = confirmModal.querySelector("#confirm-save-btn");
+      confirmBtn?.addEventListener("click", async () => {
+        const record = {
+          prefix: prefix,
+          prefix_other: prefixOther,
+          full_name: fullName,
+          position: position,
+          department: department,
+          department_other: departmentOther,
+          vehicle_list_json: JSON.stringify(vehicles),
+          total_vehicles: vehicles.length,
+          created_at: new Date().toISOString()
+        };
+
+        isCreating = true;
+        
+        const confirmSaveBtn = confirmModal.querySelector("#confirm-save-btn");
+        const confirmSaveText = confirmModal.querySelector("#confirm-save-text");
+        const confirmSaveLoading = confirmModal.querySelector("#confirm-save-loading");
+        const confirmMessage = confirmModal.querySelector("#confirm-message");
+        
+        if (confirmSaveBtn) confirmSaveBtn.disabled = true;
+        if (confirmSaveText) confirmSaveText.classList.add("hidden");
+        if (confirmSaveLoading) confirmSaveLoading.classList.remove("hidden");
+        if (confirmMessage) {
+          confirmMessage.textContent = "⏳ กำลังบันทึกข้อมูล...";
+          confirmMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-sky-700 font-semibold";
+        }
+
+        const result = await window.dataSdk.create(record);
+        
+        isCreating = false;
+
+        if (result.isOk) {
+          if (confirmMessage) {
+            confirmMessage.textContent = "✅ บันทึกข้อมูลเรียบร้อยแล้ว";
+            confirmMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-emerald-600 font-semibold";
+          }
+          
+          setTimeout(() => {
+            confirmModal.remove();
+            resetForm();
+            showMessage("✅ บันทึกข้อมูลเรียบร้อยแล้ว ขอบคุณที่ร่วมตอบแบบสำรวจ", "success");
+          }, 1500);
+        } else {
+          if (confirmSaveBtn) confirmSaveBtn.disabled = false;
+          if (confirmSaveText) confirmSaveText.classList.remove("hidden");
+          if (confirmSaveLoading) confirmSaveLoading.classList.add("hidden");
+          if (confirmMessage) {
+            confirmMessage.textContent = "❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+            confirmMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+          }
+        }
+      });
+    }
+
+    // ========== PAGE NAVIGATION ==========
+    function showPage(pageName) {
+      const surveyPage = document.getElementById("survey-page");
+      const loginPage = document.getElementById("login-page");
+      const adminPage = document.getElementById("admin-page");
+
+      surveyPage?.classList.add("hidden");
+      loginPage?.classList.add("hidden");
+      adminPage?.classList.add("hidden");
+
+      if (pageName === "survey") {
+        surveyPage?.classList.remove("hidden");
+      } else if (pageName === "login") {
+        loginPage?.classList.remove("hidden");
+      } else if (pageName === "admin") {
+        adminPage?.classList.remove("hidden");
+      }
+    }
+
+    function showLoginMessage(text, type) {
+      const msgEl = document.getElementById("login-message");
+      if (!msgEl) return;
+      
+      msgEl.textContent = text;
+      msgEl.className = "text-sm text-center min-h-[1.5rem]";
+      
+      if (type === "error") {
+        msgEl.classList.add("text-red-600", "font-semibold");
+      } else {
+        msgEl.classList.add("text-slate-600");
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      
+      const password = document.getElementById("admin-password")?.value || "";
+      
+      if (password === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        showPage("admin");
+        renderAdminData();
+        document.getElementById("admin-password").value = "";
+        showLoginMessage("", "");
+      } else {
+        showLoginMessage("❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่", "error");
+      }
+    }
+
+    function handleLogout() {
+      isLoggedIn = false;
+      showPage("survey");
+    }
+
+    // ========== ADMIN DATA RENDERING ==========
+    function renderAdminData() {
+      const searchTerm = document.getElementById("search-input")?.value.toLowerCase() || "";
+      const filterDept = document.getElementById("department-filter")?.value || "";
+
+      let filtered = currentDataRecords.filter(record => {
+        const matchSearch = !searchTerm || 
+          (record.full_name || "").toLowerCase().includes(searchTerm) ||
+          (record.vehicle_list_json || "").toLowerCase().includes(searchTerm);
+        
+        const matchDept = !filterDept || record.department === filterDept;
+        
+        return matchSearch && matchDept;
+      });
+
+      // Update statistics
+      const totalStaff = document.getElementById("total-staff");
+      const totalVehicles = document.getElementById("total-vehicles-admin");
+      const totalDepartments = document.getElementById("total-departments");
+      const filteredCount = document.getElementById("filtered-count");
+
+      if (totalStaff) totalStaff.textContent = currentDataRecords.length;
+      
+      const vehicleSum = currentDataRecords.reduce((sum, r) => sum + (Number(r.total_vehicles) || 0), 0);
+      if (totalVehicles) totalVehicles.textContent = vehicleSum;
+
+      const uniqueDepts = new Set(currentDataRecords.map(r => r.department).filter(Boolean));
+      if (totalDepartments) totalDepartments.textContent = uniqueDepts.size;
+
+      if (filteredCount) filteredCount.textContent = filtered.length;
+
+      // Update limit warning
+      const limitWarning = document.getElementById("limit-warning-admin");
+      if (limitWarning) {
+        limitWarning.classList.toggle("hidden", currentDataRecords.length < 999);
+      }
+
+      // Populate department filter
+      const deptFilter = document.getElementById("department-filter");
+      if (deptFilter && deptFilter.options.length === 1) {
+        const depts = Array.from(uniqueDepts).sort();
+        depts.forEach(dept => {
+          const option = document.createElement("option");
+          option.value = dept;
+          option.textContent = dept;
+          deptFilter.appendChild(option);
+        });
+      }
+
+      // Render data list
+      const dataList = document.getElementById("admin-data-list");
+      if (!dataList) return;
+
+      if (filtered.length === 0) {
+        dataList.innerHTML = `
+          <div class="text-center py-12 text-slate-500">
+            <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-lg font-medium">ไม่พบข้อมูลที่ค้นหา</p>
+            <p class="text-sm mt-2">ลองปรับเปลี่ยนคำค้นหาหรือตัวกรอง</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Group by department
+      const grouped = {};
+      filtered.forEach(record => {
+        const dept = record.department || "ไม่ระบุกลุ่มงาน";
+        if (!grouped[dept]) grouped[dept] = [];
+        grouped[dept].push(record);
+      });
+
+      dataList.innerHTML = "";
+
+      Object.keys(grouped).sort().forEach(dept => {
+        const records = grouped[dept];
+        
+        const deptCard = document.createElement("div");
+        deptCard.className = "bg-white rounded-xl shadow-md border-2 border-sky-100 overflow-hidden fade-in";
+
+        const deptVehicles = records.reduce((sum, r) => sum + (Number(r.total_vehicles) || 0), 0);
+
+        deptCard.innerHTML = `
+          <div class="bg-gradient-to-r from-sky-600 to-blue-600 text-white px-6 py-4">
+            <h3 class="text-lg font-bold">${dept}</h3>
+            <p class="text-sm text-sky-100 mt-1">
+              👤 ${records.length} คน · 🚗 ${deptVehicles} คัน
+            </p>
+          </div>
+          <div class="p-6 space-y-4" id="dept-${dept.replace(/\s+/g, '-')}"></div>
+        `;
+
+        const container = deptCard.querySelector(`#dept-${dept.replace(/\s+/g, '-')}`);
+
+        records.forEach((record, index) => {
+          let vehicles = [];
+          try {
+            vehicles = JSON.parse(record.vehicle_list_json || "[]");
+          } catch (e) {
+            vehicles = [];
+          }
+
+          const recordCard = document.createElement("div");
+          recordCard.className = "rounded-lg border-2 border-slate-200 bg-slate-50 p-4 hover:shadow-md transition-shadow";
+
+          let vehicleListHTML = "";
+          if (vehicles.length > 0) {
+            vehicleListHTML = vehicles.map((v, i) => `
+              <li class="flex items-start gap-2">
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-orange-400 text-white text-xs flex-shrink-0 mt-0.5">${i + 1}</span>
+                <div class="flex-1">
+                  <div><strong>ประเภท:</strong> ${v.type || "ไม่ระบุ"}</div>
+                  <div><strong>ยี่ห้อ:</strong> ${v.brand || "ไม่ระบุ"}</div>
+                  <div><strong>รุ่น:</strong> ${v.model || "ไม่ระบุ"}</div>
+                  <div><strong>ทะเบียน:</strong> ${v.plate || "ไม่ระบุ"}</div>
+                </div>
+              </li>
+            `).join("");
+          } else {
+            vehicleListHTML = "<li class='text-slate-500'>ไม่มีข้อมูลรถ</li>";
+          }
+
+          recordCard.innerHTML = `
+            <div class="flex items-start justify-between gap-4 mb-3">
+              <div class="flex-1">
+                <h4 class="text-base font-bold text-slate-900">
+                  ${record.prefix || ""} ${record.full_name || "ไม่ระบุชื่อ"}
+                </h4>
+                <p class="text-sm text-slate-600 mt-1">
+                  📋 ${record.position || "ไม่ระบุตำแหน่ง"}
+                </p>
+              </div>
+              <div class="flex flex-col gap-2">
+                <span class="inline-flex items-center justify-center rounded-full bg-orange-500 text-white text-xs font-bold px-3 py-1">
+                  ${vehicles.length} คัน
+                </span>
+                <button class="edit-record-btn text-xs text-sky-600 hover:text-sky-800 font-medium hover:underline" data-id="${record.__backendId}">
+                  แก้ไขข้อมูล
+                </button>
+                <button class="delete-record-btn text-xs text-red-600 hover:text-red-800 font-medium hover:underline" data-id="${record.__backendId}">
+                  ลบข้อมูล
+                </button>
+              </div>
+            </div>
+            <div class="border-t-2 border-slate-200 pt-3">
+              <p class="text-xs font-semibold text-slate-700 mb-2">🚗 รายการรถยนต์ / รถจักรยานยนต์:</p>
+              <ul class="space-y-2 text-xs text-slate-700">
+                ${vehicleListHTML}
+              </ul>
+            </div>
+            <div class="mt-3 pt-3 border-t border-slate-200 text-xs text-slate-500">
+              บันทึกเมื่อ: ${new Date(record.created_at).toLocaleString("th-TH")}
+            </div>
+          `;
+
+          const editBtn = recordCard.querySelector(".edit-record-btn");
+          editBtn?.addEventListener("click", () => handleEditRecord(record));
+
+          const deleteBtn = recordCard.querySelector(".delete-record-btn");
+          deleteBtn?.addEventListener("click", () => handleDeleteRecord(record));
+
+          container.appendChild(recordCard);
+        });
+
+        dataList.appendChild(deptCard);
+      });
+    }
+
+    async function handleEditRecord(record) {
+      if (!window.dataSdk || !record.__backendId) return;
+
+      let vehicles = [];
+      try {
+        vehicles = JSON.parse(record.vehicle_list_json || "[]");
+      } catch (e) {
+        vehicles = [];
+      }
+
+      const editModal = document.createElement("div");
+      editModal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4 overflow-auto";
+
+      let vehicleRowsHTML = vehicles.map((v, i) => `
+        <div class="rounded-xl border-2 border-sky-200 bg-sky-50 p-4 vehicle-edit-row" data-vehicle-index="${i}">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-bold text-sky-900">🚗 รายการรถที่ ${i + 1}</h4>
+            <button type="button" class="remove-vehicle-edit-btn text-xs text-red-600 hover:text-red-800 font-medium hover:underline">
+              ลบรายการนี้
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">ประเภทรถ <span class="text-red-500">*</span></label>
+              <select class="vehicle-type-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400">
+                <option value="">เลือกประเภทรถ</option>
+                <option value="รถยนต์" ${v.type === "รถยนต์" ? "selected" : ""}>รถยนต์</option>
+                <option value="รถจักรยานยนต์" ${v.type === "รถจักรยานยนต์" ? "selected" : ""}>รถจักรยานยนต์</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">ยี่ห้อ <span class="text-red-500">*</span></label>
+              <input type="text" class="vehicle-brand-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" value="${v.brand || ""}" placeholder="เช่น Toyota, Honda, Yamaha" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">รุ่น <span class="text-red-500">*</span></label>
+              <input type="text" class="vehicle-model-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" value="${v.model || ""}" placeholder="เช่น Vios, City, Wave" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">เลขทะเบียน <span class="text-red-500">*</span></label>
+              <input type="text" class="vehicle-plate-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" value="${v.plate || ""}" placeholder="เช่น กข-1234 บึงกาฬ" />
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      editModal.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-4xl w-full my-8">
+          <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-100 mb-4">
+              <svg class="w-8 h-8 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2">แก้ไขข้อมูล</h3>
+            <p class="text-sm text-slate-600">แก้ไขข้อมูลของ ${record.prefix || ""} ${record.full_name || ""}</p>
+          </div>
+
+          <div class="space-y-6 max-h-[60vh] overflow-auto app-scroll pr-2">
+            <!-- ข้อมูลเจ้าหน้าที่ -->
+            <div class="bg-sky-50 rounded-xl p-5 border-2 border-sky-200">
+              <h4 class="text-lg font-bold text-sky-900 mb-4">ข้อมูลเจ้าหน้าที่</h4>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-semibold text-sky-900 mb-2">คำนำหน้า <span class="text-red-500">*</span></label>
+                  <select id="edit-prefix" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-2.5 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400">
+                    <option value="">-- เลือกคำนำหน้า --</option>
+                    <option value="นาย" ${record.prefix === "นาย" ? "selected" : ""}>นาย</option>
+                    <option value="นาง" ${record.prefix === "นาง" ? "selected" : ""}>นาง</option>
+                    <option value="นางสาว" ${record.prefix === "นางสาว" ? "selected" : ""}>นางสาว</option>
+                    <option value="อื่นๆ" ${record.prefix_other ? "selected" : ""}>อื่นๆ (โปรดระบุ)</option>
+                  </select>
+                </div>
+
+                <div id="edit-prefix-other-wrapper" class="${record.prefix_other ? '' : 'hidden'}">
+                  <label class="block text-sm font-semibold text-sky-900 mb-2">โปรดระบุคำนำหน้า</label>
+                  <input id="edit-prefix-other" type="text" value="${record.prefix_other || ""}" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-2.5 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="ระบุคำนำหน้า" />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-sky-900 mb-2">ชื่อ - สกุล <span class="text-red-500">*</span></label>
+                  <input id="edit-full-name" type="text" value="${record.full_name || ""}" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-2.5 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="กรอกชื่อ - สกุล" />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-sky-900 mb-2">ตำแหน่ง <span class="text-red-500">*</span></label>
+                  <input id="edit-position" type="text" value="${record.position || ""}" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-2.5 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="เช่น พยาบาลวิชาชีพ" />
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-semibold text-sky-900 mb-2">กลุ่มงาน / งาน <span class="text-red-500">*</span></label>
+                  <input id="edit-department" type="text" value="${record.department || ""}" class="w-full rounded-lg border-2 border-sky-200 bg-white px-4 py-2.5 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="กรอกกลุ่มงาน / งาน" />
+                </div>
+              </div>
+            </div>
+
+            <!-- ข้อมูลรถยนต์ -->
+            <div class="bg-orange-50 rounded-xl p-5 border-2 border-orange-200">
+              <h4 class="text-lg font-bold text-orange-900 mb-4">ข้อมูลรถยนต์ / รถจักรยานยนต์</h4>
+              
+              <div id="vehicle-edit-list" class="space-y-4 mb-4">
+                ${vehicleRowsHTML}
+              </div>
+
+              <button type="button" id="add-vehicle-edit-btn" class="inline-flex items-center gap-2 rounded-lg bg-sky-700 text-white px-4 py-2.5 text-sm font-semibold hover:bg-sky-800 transition-colors shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                เพิ่มรายการรถ
+              </button>
+            </div>
+          </div>
+
+          <div id="edit-message" class="mt-4 text-sm text-center min-h-[1.5rem]"></div>
+
+          <div class="flex flex-col sm:flex-row gap-3 mt-6 pt-6 border-t-2 border-slate-200">
+            <button type="button" id="save-edit-btn" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 text-white px-6 py-3.5 text-base font-bold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-lg">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span id="save-edit-text">บันทึกการแก้ไข</span>
+              <span id="save-edit-loading" class="hidden">
+                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            </button>
+            <button type="button" id="cancel-edit-btn" class="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border-2 border-slate-300 bg-white text-slate-700 px-6 py-3.5 text-base font-semibold hover:bg-slate-50 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(editModal);
+
+      // Handle prefix other field
+      const editPrefix = editModal.querySelector("#edit-prefix");
+      const editPrefixOtherWrapper = editModal.querySelector("#edit-prefix-other-wrapper");
+      editPrefix?.addEventListener("change", (e) => {
+        editPrefixOtherWrapper?.classList.toggle("hidden", e.target.value !== "อื่นๆ");
+      });
+
+      // Handle remove vehicle
+      function updateVehicleEditNumbers() {
+        const rows = editModal.querySelectorAll(".vehicle-edit-row");
+        rows.forEach((row, index) => {
+          const title = row.querySelector("h4");
+          if (title) title.textContent = `🚗 รายการรถที่ ${index + 1}`;
+        });
+      }
+
+      editModal.querySelectorAll(".remove-vehicle-edit-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const row = e.target.closest(".vehicle-edit-row");
+          row?.remove();
+          updateVehicleEditNumbers();
+        });
+      });
+
+      // Handle add vehicle
+      const addVehicleEditBtn = editModal.querySelector("#add-vehicle-edit-btn");
+      addVehicleEditBtn?.addEventListener("click", () => {
+        const vehicleEditList = editModal.querySelector("#vehicle-edit-list");
+        if (!vehicleEditList) return;
+
+        const currentCount = vehicleEditList.querySelectorAll(".vehicle-edit-row").length;
+        const newRow = document.createElement("div");
+        newRow.className = "rounded-xl border-2 border-sky-200 bg-sky-50 p-4 vehicle-edit-row";
+        newRow.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-sm font-bold text-sky-900">🚗 รายการรถที่ ${currentCount + 1}</h4>
+            <button type="button" class="remove-vehicle-edit-btn text-xs text-red-600 hover:text-red-800 font-medium hover:underline">
+              ลบรายการนี้
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">ประเภทรถ <span class="text-red-500">*</span></label>
+              <select class="vehicle-type-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400">
+                <option value="">เลือกประเภทรถ</option>
+                <option value="รถยนต์">รถยนต์</option>
+                <option value="รถจักรยานยนต์">รถจักรยานยนต์</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">ยี่ห้อ <span class="text-red-500">*</span></label>
+              <input type="text" class="vehicle-brand-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="เช่น Toyota, Honda, Yamaha" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">รุ่น <span class="text-red-500">*</span></label>
+              <input type="text" class="vehicle-model-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="เช่น Vios, City, Wave" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-sky-900 mb-1">เลขทะเบียน <span class="text-red-500">*</span></label>
+              <input type="text" class="vehicle-plate-edit w-full rounded-lg border-2 border-sky-200 bg-white px-3 py-2 text-sm text-sky-900 focus:ring-2 focus:ring-orange-400" placeholder="เช่น กข-1234 บึงกาฬ" />
+            </div>
+          </div>
+        `;
+
+        newRow.querySelector(".remove-vehicle-edit-btn")?.addEventListener("click", () => {
+          newRow.remove();
+          updateVehicleEditNumbers();
+        });
+
+        vehicleEditList.appendChild(newRow);
+      });
+
+      // Handle cancel
+      const cancelEditBtn = editModal.querySelector("#cancel-edit-btn");
+      cancelEditBtn?.addEventListener("click", () => {
+        editModal.remove();
+      });
+
+      // Handle save
+      const saveEditBtn = editModal.querySelector("#save-edit-btn");
+      saveEditBtn?.addEventListener("click", async () => {
+        const editMessage = editModal.querySelector("#edit-message");
+        
+        const prefix = editModal.querySelector("#edit-prefix")?.value.trim() || "";
+        const prefixOther = editModal.querySelector("#edit-prefix-other")?.value.trim() || "";
+        const fullName = editModal.querySelector("#edit-full-name")?.value.trim() || "";
+        const position = editModal.querySelector("#edit-position")?.value.trim() || "";
+        const department = editModal.querySelector("#edit-department")?.value.trim() || "";
+
+        if (!prefix || !fullName || !position || !department) {
+          if (editMessage) {
+            editMessage.textContent = "❌ กรุณากรอกข้อมูลให้ครบถ้วน";
+            editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+          }
+          return;
+        }
+
+        if (prefix === "อื่นๆ" && !prefixOther) {
+          if (editMessage) {
+            editMessage.textContent = "❌ กรุณาระบุคำนำหน้า";
+            editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+          }
+          return;
+        }
+
+        // Get vehicle data
+        const vehicleRows = editModal.querySelectorAll(".vehicle-edit-row");
+        const editedVehicles = [];
+        
+        for (let i = 0; i < vehicleRows.length; i++) {
+          const row = vehicleRows[i];
+          const type = row.querySelector(".vehicle-type-edit")?.value.trim() || "";
+          const brand = row.querySelector(".vehicle-brand-edit")?.value.trim() || "";
+          const model = row.querySelector(".vehicle-model-edit")?.value.trim() || "";
+          const plate = row.querySelector(".vehicle-plate-edit")?.value.trim() || "";
+
+          if (!type || !brand || !model || !plate) {
+            if (editMessage) {
+              editMessage.textContent = `❌ กรุณากรอกข้อมูลรถให้ครบถ้วนในรายการที่ ${i + 1}`;
+              editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+            }
+            return;
+          }
+
+          editedVehicles.push({
+            index: i + 1,
+            type,
+            brand,
+            model,
+            plate
+          });
+        }
+
+        if (editedVehicles.length === 0) {
+          if (editMessage) {
+            editMessage.textContent = "❌ กรุณาเพิ่มอย่างน้อย 1 รายการรถ";
+            editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+          }
+          return;
+        }
+
+        // ตรวจสอบทะเบียนซ้ำในฟอร์มแก้ไข
+        const editPlateNumbers = editedVehicles.map(v => v.plate.trim().toLowerCase());
+        const editDuplicatesInForm = editPlateNumbers.filter((plate, index) => editPlateNumbers.indexOf(plate) !== index);
+        if (editDuplicatesInForm.length > 0) {
+          if (editMessage) {
+            editMessage.textContent = `❌ พบเลขทะเบียนซ้ำในฟอร์ม: ${editDuplicatesInForm.join(", ")}`;
+            editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+          }
+          return;
+        }
+
+        // ตรวจสอบทะเบียนซ้ำกับข้อมูลในระบบ (ยกเว้นรายการที่กำลังแก้ไข)
+        const existingPlatesEdit = [];
+        for (const rec of currentDataRecords) {
+          if (rec.__backendId === record.__backendId) continue; // ข้ามรายการที่กำลังแก้ไข
+          
+          try {
+            const recordVehicles = JSON.parse(rec.vehicle_list_json || "[]");
+            recordVehicles.forEach(v => {
+              if (v.plate) {
+                existingPlatesEdit.push({
+                  plate: v.plate.trim().toLowerCase(),
+                  owner: `${rec.prefix || ""} ${rec.full_name || ""}`,
+                  department: rec.department || "",
+                  type: v.type || "",
+                  brand: v.brand || "",
+                  model: v.model || ""
+                });
+              }
+            });
+          } catch (e) {
+            // Skip invalid records
+          }
+        }
+
+        const editDuplicates = [];
+        for (const vehicle of editedVehicles) {
+          const plateLower = vehicle.plate.trim().toLowerCase();
+          const existing = existingPlatesEdit.find(ep => ep.plate === plateLower);
+          if (existing) {
+            editDuplicates.push({
+              plate: vehicle.plate,
+              owner: existing.owner,
+              department: existing.department,
+              type: existing.type,
+              brand: existing.brand,
+              model: existing.model
+            });
+          }
+        }
+
+        if (editDuplicates.length > 0) {
+          editModal.remove();
+          showDuplicatePlateWarning(editDuplicates);
+          return;
+        }
+
+        const finalPrefix = prefix === "อื่นๆ" ? prefixOther : prefix;
+
+        // Update record
+        const updatedRecord = {
+          ...record,
+          prefix: finalPrefix,
+          prefix_other: prefix === "อื่นๆ" ? prefixOther : "",
+          full_name: fullName,
+          position: position,
+          department: department,
+          department_other: "",
+          vehicle_list_json: JSON.stringify(editedVehicles),
+          total_vehicles: editedVehicles.length
+        };
+
+        // Show loading
+        if (saveEditBtn) saveEditBtn.disabled = true;
+        const saveEditText = editModal.querySelector("#save-edit-text");
+        const saveEditLoading = editModal.querySelector("#save-edit-loading");
+        if (saveEditText) saveEditText.classList.add("hidden");
+        if (saveEditLoading) saveEditLoading.classList.remove("hidden");
+        if (editMessage) {
+          editMessage.textContent = "⏳ กำลังบันทึกการแก้ไข...";
+          editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-sky-700 font-semibold";
+        }
+
+        const result = await window.dataSdk.update(updatedRecord);
+
+        if (result.isOk) {
+          if (editMessage) {
+            editMessage.textContent = "✅ บันทึกการแก้ไขเรียบร้อยแล้ว";
+            editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-emerald-600 font-semibold";
+          }
+          
+          setTimeout(() => {
+            editModal.remove();
+          }, 1500);
+        } else {
+          if (saveEditBtn) saveEditBtn.disabled = false;
+          if (saveEditText) saveEditText.classList.remove("hidden");
+          if (saveEditLoading) saveEditLoading.classList.add("hidden");
+          if (editMessage) {
+            editMessage.textContent = "❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+            editMessage.className = "mt-4 text-sm text-center min-h-[1.5rem] text-red-600 font-semibold";
+          }
+        }
+      });
+    }
+
+    async function handleDeleteRecord(record) {
+      if (!window.dataSdk || !record.__backendId) return;
+
+      const confirmDelete = document.createElement("div");
+      confirmDelete.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4";
+      confirmDelete.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-md w-full">
+          <h3 class="text-lg font-bold text-slate-900 mb-2">ยืนยันการลบข้อมูล</h3>
+          <p class="text-sm text-slate-600 mb-6">
+            คุณต้องการลบข้อมูลของ <strong>${record.prefix || ""} ${record.full_name || ""}</strong> ใช่หรือไม่?
+          </p>
+          <div class="flex gap-3">
+            <button id="confirm-delete" class="flex-1 rounded-lg bg-red-600 text-white px-4 py-2.5 text-sm font-bold hover:bg-red-700">
+              ยืนยันลบ
+            </button>
+            <button id="cancel-delete" class="flex-1 rounded-lg border-2 border-slate-300 bg-white text-slate-700 px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(confirmDelete);
+
+      confirmDelete.querySelector("#cancel-delete")?.addEventListener("click", () => {
+        confirmDelete.remove();
+      });
+
+      confirmDelete.querySelector("#confirm-delete")?.addEventListener("click", async () => {
+        const result = await window.dataSdk.delete(record);
+        confirmDelete.remove();
+        
+        if (!result.isOk) {
+          const errorMsg = document.createElement("div");
+          errorMsg.className = "fixed top-4 right-4 bg-red-100 border-2 border-red-400 text-red-800 px-6 py-3 rounded-lg shadow-lg z-50";
+          errorMsg.textContent = "❌ ไม่สามารถลบข้อมูลได้ กรุณาลองใหม่";
+          document.body.appendChild(errorMsg);
+          setTimeout(() => errorMsg.remove(), 3000);
+        }
+      });
+    }
+
+    // ========== EVENT LISTENERS ==========
+    document.addEventListener("DOMContentLoaded", () => {
+      // Survey form
+      const surveyForm = document.getElementById("survey-form");
+      surveyForm?.addEventListener("submit", handleSubmit);
+
+      const resetBtn = document.getElementById("reset-btn");
+      resetBtn?.addEventListener("click", resetForm);
+
+      const addVehicleBtn = document.getElementById("add-vehicle-btn");
+      addVehicleBtn?.addEventListener("click", addVehicleRow);
+
+      // Conditional fields
+      const prefixSelect = document.getElementById("prefix");
+      prefixSelect?.addEventListener("change", (e) => {
+        const wrapper = document.getElementById("prefix-other-wrapper");
+        wrapper?.classList.toggle("hidden", e.target.value !== "อื่นๆ");
+      });
+
+      const deptSelect = document.getElementById("department");
+      deptSelect?.addEventListener("change", (e) => {
+        const wrapper = document.getElementById("department-other-wrapper");
+        wrapper?.classList.toggle("hidden", e.target.value !== "อื่นๆ");
+      });
+
+      // Navigation
+      const goToAdminBtn = document.getElementById("go-to-admin-btn");
+      goToAdminBtn?.addEventListener("click", () => showPage("login"));
+
+      const backToSurveyBtn = document.getElementById("back-to-survey-btn");
+      backToSurveyBtn?.addEventListener("click", () => showPage("survey"));
+
+      const logoutBtn = document.getElementById("logout-btn");
+      logoutBtn?.addEventListener("click", handleLogout);
+
+      // Login
+      const loginForm = document.getElementById("login-form");
+      loginForm?.addEventListener("submit", handleLogin);
+
+      // Admin filters
+      const searchInput = document.getElementById("search-input");
+      searchInput?.addEventListener("input", () => {
+        if (isLoggedIn) renderAdminData();
+      });
+
+      const deptFilter = document.getElementById("department-filter");
+      deptFilter?.addEventListener("change", () => {
+        if (isLoggedIn) renderAdminData();
+      });
+
+      const clearFilterBtn = document.getElementById("clear-filter-btn");
+      clearFilterBtn?.addEventListener("click", () => {
+        if (searchInput) searchInput.value = "";
+        if (deptFilter) deptFilter.value = "";
+        if (isLoggedIn) renderAdminData();
+      });
+
+      // Initialize
+      addVehicleRow();
+      showPage("survey");
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ac210c097af7b46',t:'MTc2NTQyNTUyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
