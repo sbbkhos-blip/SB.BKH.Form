@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>แบบสำรวจยานพาหนะไฟฟ้า (EV) โรงพยาบาลบึงกาฬ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E2A28;
+  --paper:#F6FAF7;
+  --paper-2:#EDF4EE;
+  --card:#FFFFFF;
+  --teal:#0B4A46;
+  --teal-2:#0E635D;
+  --volt:#8CE24B;
+  --volt-deep:#5FAE28;
+  --amber:#FFB627;
+  --line:#DCE7DE;
+  --muted:#5B7570;
+  --danger:#D64545;
+  --radius:18px;
+  --shadow: 0 10px 30px -12px rgba(11,74,70,0.25);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1200px 600px at 100% -10%, #E4F6D8 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 0%, #DCEFEA 0%, transparent 55%),
+    var(--paper);
+  color:var(--ink);
+  font-family:'Sarabun',sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Kanit',sans-serif;}
+#app{max-width:560px;margin:0 auto;padding:20px 16px 100px;min-height:100vh;position:relative;}
+
+/* ---------- Top bar ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.bolt-badge{
+  width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(145deg,var(--volt),var(--volt-deep));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 14px -4px rgba(95,174,40,0.55);
+  flex-shrink:0;
+}
+.bolt-badge svg{width:22px;height:22px;}
+.topbar .titles{line-height:1.25;}
+.topbar .titles .eyebrow{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.03em;}
+.topbar .titles .name{font-family:'Kanit',sans-serif;font-weight:700;font-size:16px;color:var(--teal);}
+
+/* ---------- Hero ---------- */
+.hero{
+  background:linear-gradient(160deg,var(--teal) 0%, var(--teal-2) 65%, #12746C 100%);
+  border-radius:24px;
+  padding:26px 22px 24px;
+  color:#EAF7F0;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+.hero::after{
+  content:"";
+  position:absolute; right:-40px; top:-40px;
+  width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle, rgba(140,226,75,0.35), transparent 70%);
+}
+.hero h1{font-size:22px;line-height:1.35;margin:0 0 8px;font-weight:700;}
+.hero p{font-size:13.5px;line-height:1.6;color:#CFE8DD;margin:0;position:relative;z-index:1;}
+.deadline-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;
+  background:rgba(140,226,75,0.16);
+  border:1px solid rgba(140,226,75,0.4);
+  color:var(--volt);
+  padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;
+  position:relative;z-index:1;
+}
+
+/* ---------- Battery step progress ---------- */
+.battery{display:flex;align-items:center;gap:8px;margin:4px 0 22px;}
+.battery .cells{display:flex;gap:4px;flex:1;}
+.battery .cell{flex:1;height:9px;border-radius:4px;background:var(--line);transition:background .3s;}
+.battery .cell.filled{background:linear-gradient(90deg,var(--volt-deep),var(--volt));}
+.battery .tip{width:5px;height:16px;border-radius:0 3px 3px 0;background:var(--line);}
+.battery .label{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;}
+
+/* ---------- Cards / menu ---------- */
+.menu-card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:20px;
+  display:flex;gap:14px;align-items:flex-start;
+  border:1px solid var(--line);
+  box-shadow:0 6px 18px -12px rgba(11,42,40,0.25);
+  cursor:pointer;
+  margin-bottom:14px;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.menu-card:active{transform:scale(0.98);}
+.menu-card:hover{border-color:var(--volt-deep);box-shadow:0 10px 24px -10px rgba(95,174,40,0.35);}
+.menu-icon{
+  width:48px;height:48px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,#EAF7EA,#D9F0DC);
+  color:var(--teal-2);
+}
+.menu-icon svg{width:24px;height:24px;}
+.menu-text .t{font-family:'Kanit',sans-serif;font-weight:600;font-size:15.5px;color:var(--ink);margin-bottom:3px;}
+.menu-text .d{font-size:13px;color:var(--muted);line-height:1.5;}
+.menu-arrow{margin-left:auto;color:var(--muted);align-self:center;flex-shrink:0;}
+
+.footer-links{display:flex;gap:10px;margin-top:22px;}
+.footer-link{
+  flex:1;text-align:center;padding:12px 10px;border-radius:14px;
+  background:var(--card);border:1px solid var(--line);
+  font-size:12.5px;font-weight:600;color:var(--teal-2);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.footer-link:hover{border-color:var(--teal-2);}
+.footer-link svg{width:18px;height:18px;}
+
+/* ---------- Section / step card ---------- */
+.section-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;box-shadow:0 6px 18px -14px rgba(11,42,40,0.2);
+}
+.section-title{font-family:'Kanit',sans-serif;font-weight:600;font-size:15px;color:var(--teal);margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+.section-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.5;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px;}
+.field .hint{font-size:11.5px;color:var(--muted);margin-top:5px;}
+input[type=text],input[type=tel],input[type=number],textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;
+  padding:12px 14px;font-family:'Sarabun',sans-serif;font-size:14.5px;color:var(--ink);
+  background:#FCFDFC;transition:border-color .15s;
+}
+input:focus,textarea:focus{outline:none;border-color:var(--teal-2);}
+textarea{min-height:90px;resize:vertical;}
+
+.lookup-row{display:flex;gap:8px;}
+.lookup-row input{flex:1;}
+.btn-lookup{
+  background:var(--teal);color:#fff;border:none;border-radius:12px;padding:0 16px;
+  font-family:'Kanit',sans-serif;font-weight:500;font-size:13.5px;cursor:pointer;flex-shrink:0;
+}
+.btn-lookup:active{transform:scale(0.97);}
+
+.autofill-box{
+  margin-top:10px;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+  display:none;
+}
+.autofill-box.show{display:block;}
+.autofill-box .row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
+.autofill-box .row span:first-child{color:var(--muted);}
+.autofill-box .row span:last-child{font-weight:600;color:var(--ink);}
+
+.msg{border-radius:12px;padding:11px 14px;font-size:13px;margin-top:10px;display:none;}
+.msg.show{display:block;}
+.msg.error{background:#FDECEC;color:var(--danger);border:1px solid #F5C6C6;}
+.msg.warn{background:#FFF6E3;color:#8A5A00;border:1px solid #FADFA0;}
+.msg.ok{background:#EAF7E4;color:var(--volt-deep);border:1px solid #C8EBB4;}
+
+/* radio / choice pills */
+.choice-group{display:flex;flex-direction:column;gap:9px;}
+.choice{
+  display:flex;align-items:center;gap:11px;border:1.5px solid var(--line);border-radius:12px;
+  padding:12px 14px;cursor:pointer;transition:border-color .15s, background .15s;
+}
+.choice:hover{border-color:var(--teal-2);}
+.choice.selected{border-color:var(--volt-deep);background:#F2FBEC;}
+.choice .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;position:relative;}
+.choice.selected .dot{border-color:var(--volt-deep);}
+.choice.selected .dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--volt-deep);}
+.choice .txt{font-size:14px;color:var(--ink);font-weight:500;}
+
+/* vehicle rows */
+.vehicle-card{border:1.5px dashed var(--line);border-radius:14px;padding:14px;margin-bottom:12px;position:relative;background:#FCFDFC;}
+.vehicle-card .vh-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.vehicle-card .vh-num{font-family:'Kanit',sans-serif;font-weight:600;font-size:13px;color:var(--teal-2);}
+.vh-remove{border:none;background:none;color:var(--danger);font-size:12.5px;cursor:pointer;font-weight:600;}
+.vh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.vh-grid .full{grid-column:1/-1;}
+.vh-grid label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+.vh-grid input{padding:9px 11px;font-size:13.5px;}
+.btn-add{
+  width:100%;border:1.5px dashed var(--teal-2);color:var(--teal-2);background:#F5FAF8;
+  border-radius:12px;padding:11px;font-family:'Kanit',sans-serif;font-weight:500;font-size:13.5px;cursor:pointer;
+}
+
+/* ---------- Bottom nav ---------- */
+.bottom-bar{
+  position:fixed;left:0;right:0;bottom:0;
+  background:rgba(246,250,247,0.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  display:flex;gap:10px;z-index:20;
+}
+.bottom-bar-inner{max-width:560px;margin:0 auto;display:flex;gap:10px;width:100%;}
+.btn{
+  flex:1;border:none;border-radius:14px;padding:14px;font-family:'Kanit',sans-serif;font-weight:600;
+  font-size:14.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-primary{background:linear-gradient(135deg,var(--volt-deep),var(--volt));color:#0E2A28;box-shadow:0 8px 18px -8px rgba(95,174,40,0.55);}
+.btn-primary:active{transform:scale(0.98);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-ghost{background:#fff;color:var(--teal);border:1.5px solid var(--line);flex:0 0 auto;padding:14px 18px;}
+.btn-ghost:active{transform:scale(0.98);}
+
+/* ---------- Back / header row for sub pages ---------- */
+.page-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.back-btn{width:38px;height:38px;border-radius:11px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.page-head h2{font-size:17px;margin:0;color:var(--teal);font-weight:600;}
+
+/* ---------- Summary page ---------- */
+.stat-hero{
+  background:linear-gradient(160deg,var(--teal),var(--teal-2));
+  border-radius:20px;padding:22px;color:#fff;text-align:center;margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.stat-hero .big{font-family:'Kanit',sans-serif;font-size:42px;font-weight:700;color:var(--volt);line-height:1;}
+.stat-hero .cap{font-size:13px;color:#CFE8DD;margin-top:6px;}
+.stat-hero .sub{font-size:12px;color:#AFCFC3;margin-top:10px;}
+
+.dept-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+.dept-row:last-child{border-bottom:none;}
+.dept-row .info{flex:1;min-width:0;}
+.dept-row .dname{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dept-row .dcount{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.dept-row .bar-track{height:7px;background:var(--paper-2);border-radius:4px;overflow:hidden;margin-top:6px;}
+.dept-row .bar-fill{height:100%;background:linear-gradient(90deg,var(--volt-deep),var(--volt));border-radius:4px;}
+.dept-row .pct{font-family:'Kanit',sans-serif;font-weight:600;font-size:13px;color:var(--teal-2);width:44px;text-align:right;flex-shrink:0;}
+.dept-row .check{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.check.yes{background:#E7F7DF;color:var(--volt-deep);}
+.check.no{background:#F3F3F3;color:#B5B5B5;}
+
+.password-gate{text-align:center;padding:30px 10px;}
+.password-gate .lock{width:56px;height:56px;border-radius:16px;background:linear-gradient(150deg,#EAF7EA,#D9F0DC);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--teal-2);}
+.password-gate input{text-align:center;letter-spacing:.15em;font-size:18px;margin-top:12px;}
+
+.setup-note{background:#FFF6E3;border:1px solid #FADFA0;border-radius:14px;padding:14px 16px;font-size:12.5px;color:#8A5A00;line-height:1.6;margin-bottom:16px;}
+.setup-note b{display:block;margin-bottom:4px;font-family:'Kanit',sans-serif;}
+
+.empty-state{text-align:center;padding:30px 10px;color:var(--muted);font-size:13px;}
+.spinner{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--volt-deep);animation:spin 0.8s linear infinite;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.confirm-card{background:#F2FBEC;border:1.5px solid #C8EBB4;border-radius:16px;padding:18px;text-align:center;}
+.confirm-card svg{width:40px;height:40px;color:var(--volt-deep);margin-bottom:10px;}
+.confirm-card h3{margin:0 0 6px;font-size:16px;color:var(--teal);}
+.confirm-card p{margin:0;font-size:13px;color:var(--muted);line-height:1.6;}
+
+@media(max-width:380px){
+  .vh-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ======================= CONFIG ======================= */
+const CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyo2Ws91bFc7HFvW2JZB6LrRiz97qX87uSOIK_hXF41mQN5hdz_UYGVCS3YVuaC66s7/exec",
+  SUMMARY_PASSWORD: "BKN11040",
+  DEADLINE: "22 กรกฎาคม 2569"
+};
+
+/* ======================= DATA ======================= */
+const PEOPLE = [{"id": "1", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นางสาว", "fname": "พิมพ์รพัช", "lname": "หาญเชิงชัย"}, {"id": "2", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาย", "fname": "จิตติภัทร์", "lname": "ระหารนอก"}, {"id": "3", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาง", "fname": "กาญจนา", "lname": "อุตรธิยางค์"}, {"id": "4", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาง", "fname": "สุจิตรา", "lname": "ดาจง"}, {"id": "5", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาง", "fname": "วงเดือน", "lname": "ชีระธรรม"}, {"id": "6", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาย", "fname": "สาวิทย์", "lname": "สุริยะกาญจน์"}, {"id": "7", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาย", "fname": "วรวัฒธ์", "lname": "บุษราคำ"}, {"id": "8", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นางสาว", "fname": "ปัญญดา", "lname": "นาแว่น"}, {"id": "9", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาย", "fname": "สุนาวิน", "lname": "นาคสกุล"}, {"id": "10", "dept": "กลุ่มงานบริหารทั่วไป", "prefix": "นาย", "fname": "อุทัย", "lname": "พิรักษา"}, {"id": "12", "dept": "งานประชาสัมพันธ์", "prefix": "นางสาว", "fname": "จิราภรณ์", "lname": "คำภูเมือง"}, {"id": "13", "dept": "งานประชาสัมพันธ์", "prefix": "นางสาว", "fname": "วรรณิสา", "lname": "ดาวเสด็จ"}, {"id": "15", "dept": "การเงิน", "prefix": "นางสาว", "fname": "สุมาลี", "lname": "หาชานนท์"}, {"id": "16", "dept": "การเงิน", "prefix": "นาง", "fname": "พิราวรรณ", "lname": "สุทธิสาร"}, {"id": "17", "dept": "การเงิน", "prefix": "นาง", "fname": "รัตติกร", "lname": "ฮาตระวัง"}, {"id": "18", "dept": "การเงิน", "prefix": "นาย", "fname": "หนึ่งธิดา", "lname": "ขันธ์แก้ว"}, {"id": "19", "dept": "การเงิน", "prefix": "นาง", "fname": "ธิติมา", "lname": "เคหะฐาน"}, {"id": "20", "dept": "การเงิน", "prefix": "นางสาว", "fname": "ลภัสรดา", "lname": "พันเทศ"}, {"id": "21", "dept": "การเงิน", "prefix": "นางสาว", "fname": "พรรษาวดี", "lname": "ตาละเต็ง"}, {"id": "22", "dept": "การเงิน", "prefix": "นางสาว", "fname": "หงษ์ฟ้า", "lname": "ศิริวาลย์"}, {"id": "23", "dept": "การเงิน", "prefix": "นางสาว", "fname": "จินตนา", "lname": "ดงปะขา"}, {"id": "24", "dept": "การเงิน", "prefix": "นางสาว", "fname": "ธนัญชนก", "lname": "ชาญประเสริฐ"}, {"id": "25", "dept": "การเงิน", "prefix": "นางสาว", "fname": "กชกร", "lname": "นาไชย"}, {"id": "26", "dept": "การเงิน", "prefix": "นางสาว", "fname": "ดวงใจ", "lname": "ศรีชุม"}, {"id": "28", "dept": "บัญชี", "prefix": "นาง", "fname": "รุ่งนภา", "lname": "อารีรมย์"}, {"id": "29", "dept": "บัญชี", "prefix": "นางสาว", "fname": "ปฐมา", "lname": "หัตถกรรม"}, {"id": "30", "dept": "บัญชี", "prefix": "นางสาว", "fname": "ธญาดา", "lname": "สะพังเงิน"}, {"id": "31", "dept": "บัญชี", "prefix": "นางสาว", "fname": "ชลนิภา", "lname": "หงษาคำ"}, {"id": "32", "dept": "บัญชี", "prefix": "นางสาว", "fname": "รุ่งตะวัน", "lname": "ปักขะพล"}, {"id": "33", "dept": "บัญชี", "prefix": "นางสาว", "fname": "อมรรัตน์", "lname": "อักษรทอง"}, {"id": "34", "dept": "บัญชี", "prefix": "นางสาว", "fname": "จีรพร", "lname": "บัณฑิต"}, {"id": "36", "dept": "พัสดุ", "prefix": "นาง", "fname": "สุวรรณี", "lname": "ภูเภา"}, {"id": "37", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "ศุภลักษณ์", "lname": "ไชยพันธ์"}, {"id": "38", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "คำแก้ว", "lname": "พาที"}, {"id": "39", "dept": "พัสดุ", "prefix": "นาย", "fname": "ศักดิ์ชัย", "lname": "ติธรรม"}, {"id": "40", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "พนิดา", "lname": "พละสาร"}, {"id": "41", "dept": "พัสดุ", "prefix": "นาย", "fname": "จิรพงษ์", "lname": "หลวงชา"}, {"id": "42", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "ยุภา", "lname": "ชารี"}, {"id": "43", "dept": "พัสดุ", "prefix": "นาย", "fname": "ทศพงษ์", "lname": "เจริญดี"}, {"id": "44", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "สุภัชกานต์", "lname": "รินทรักษ์"}, {"id": "45", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "สุกัญญา", "lname": "ติดมา"}, {"id": "46", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "วรรณิภา", "lname": "แสนทวีสุข"}, {"id": "47", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "ธารารัตน์", "lname": "ช่างเหล็ก"}, {"id": "48", "dept": "พัสดุ", "prefix": "นางสาว", "fname": "อรนิภา", "lname": "ดางจัง"}, {"id": "50", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "สรารัตน์", "lname": "ราภูมี"}, {"id": "51", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "เกศฎา", "lname": "ขันคุ้ม"}, {"id": "52", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "กัลยา", "lname": "ดาราษฏร์"}, {"id": "53", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "เจนจิรา", "lname": "วิระพันธ์"}, {"id": "54", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "ภัคจิรา", "lname": "หล้าอามาตย์"}, {"id": "55", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "ฐิติมา", "lname": "วิยะโส"}, {"id": "56", "dept": "งานทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "สมฤดี", "lname": "สีโดน"}, {"id": "58", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "อำนาจ", "lname": "รัตนะ"}, {"id": "59", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "สุขสันต์", "lname": "เสนจันทร์ฒิไชย"}, {"id": "60", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "กิตติพงษ์", "lname": "แก้วก่ำ"}, {"id": "61", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "ธงชัย", "lname": "ลาลด"}, {"id": "62", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "ฐิติโชติ", "lname": "วิทยะ"}, {"id": "63", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "ธนานันท์", "lname": "ชัยมานันท์"}, {"id": "64", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "ปิยะ", "lname": "โพธิ์คำ"}, {"id": "65", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "รณชิต", "lname": "สุวรรณชัย"}, {"id": "66", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "วิทยา", "lname": "ไชยมาต"}, {"id": "67", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "จารุพัฒน", "lname": "สุขจันดี"}, {"id": "68", "dept": "งานยานพาหนะ", "prefix": "นาย", "fname": "อนุวัฒน์", "lname": "พลภักดี"}, {"id": "70", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "ประสิทธิ์", "lname": "ปานทอง"}, {"id": "71", "dept": "งานโครงสร้างฯ", "prefix": "นางสาว", "fname": "กาญจนา", "lname": "ศรนรินทร์"}, {"id": "72", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "วีรศักดิ์", "lname": "ไชยปัญญา"}, {"id": "73", "dept": "งานโครงสร้างฯ", "prefix": "นางสาว", "fname": "พิมประภา", "lname": "ถาวร"}, {"id": "74", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "อนุชิต", "lname": "นาคแก้ว"}, {"id": "75", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "อภิชาติ", "lname": "ฮาตระวัง"}, {"id": "76", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "สมิต", "lname": "กองพิมพ์"}, {"id": "77", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "เดชชัย", "lname": "ล้านพุฒ"}, {"id": "78", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "สัตยา", "lname": "มีแก่น"}, {"id": "79", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "ชรัมพล", "lname": "ดีท่าโพธิ์"}, {"id": "80", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "สถาพร", "lname": "ไชยพร"}, {"id": "81", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "ชัยนรัตน์", "lname": "อยู่ขอบเวียง"}, {"id": "82", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "ธนโชค", "lname": "นิทธานนท์"}, {"id": "83", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "ศรีสุวรรณ", "lname": "เจริญศิลป์"}, {"id": "84", "dept": "งานโครงสร้างฯ", "prefix": "นาย", "fname": "กฤษดา", "lname": "ลาประทุม"}, {"id": "86", "dept": "งานบ่อบำบัด", "prefix": "นาย", "fname": "วุฒิชัย", "lname": "ศรีหาวงษ์"}, {"id": "88", "dept": "งานภาคสนาม", "prefix": "นางสาว", "fname": "ปิยะรัตน์", "lname": "สำโรงแสง"}, {"id": "89", "dept": "งานภาคสนาม", "prefix": "นาย", "fname": "กิตติภูมิฐ์", "lname": "เกตแพง"}, {"id": "90", "dept": "งานภาคสนาม", "prefix": "นางสาว", "fname": "พรรณพณัฐชา", "lname": "วงศ์หาบุตร"}, {"id": "91", "dept": "งานภาคสนาม", "prefix": "นาย", "fname": "พูนศักดิ์", "lname": "วงษ์คำหาญ"}, {"id": "94", "dept": "งานกำจัดขยะ", "prefix": "นาย", "fname": "อดิศักดิ์", "lname": "พลเต้า"}, {"id": "95", "dept": "งานกำจัดขยะ", "prefix": "นาย", "fname": "ประสิทธิ์", "lname": "ไตยพันธ์"}, {"id": "96", "dept": "งานกำจัดขยะ", "prefix": "นาย", "fname": "ธนกร", "lname": "อนันทวัน"}, {"id": "97", "dept": "งานกำจัดขยะ", "prefix": "นาย", "fname": "เกียรติศักดิ์", "lname": "แก้วเทพ"}, {"id": "98", "dept": "งานกำจัดขยะ", "prefix": "นาย", "fname": "จิรภัทร", "lname": "คงสมบุตร"}, {"id": "100", "dept": "งานซักฟอก", "prefix": "นาง", "fname": "เถาวัลย์", "lname": "ราชคต"}, {"id": "101", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "วนิฎา", "lname": "เครือเนตร"}, {"id": "102", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "เพ็ญนภา", "lname": "ภูทิพย์"}, {"id": "103", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "พนิตตา", "lname": "มุสตาฟาดี"}, {"id": "104", "dept": "งานซักฟอก", "prefix": "นาย", "fname": "ชัยวัฒน์", "lname": "มิตะนุ"}, {"id": "105", "dept": "งานซักฟอก", "prefix": "นาง", "fname": "สมภาร", "lname": "ทองขาว"}, {"id": "106", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "กัญญารัตน์", "lname": "โพธิ์บึงกาฬ"}, {"id": "107", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "ดวงฤดี", "lname": "ชัยปลัด"}, {"id": "108", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "วานิช", "lname": "ระวะใจ"}, {"id": "109", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "พรนภา", "lname": "จันทรบูชา"}, {"id": "110", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "ปิยะนุช", "lname": "บุตยา"}, {"id": "111", "dept": "งานซักฟอก", "prefix": "นาย", "fname": "ธนวัฒน์", "lname": "แสงวงค์"}, {"id": "112", "dept": "งานซักฟอก", "prefix": "นางสาว", "fname": "สุนิชา", "lname": "เชื้อเพ็ชร"}, {"id": "114", "dept": "งานตัดเย็บ", "prefix": "นาง", "fname": "อรทัย", "lname": "ไกรรัตน์"}, {"id": "115", "dept": "งานตัดเย็บ", "prefix": "นางสาว", "fname": "ศศิธร", "lname": "สารพันลำ"}, {"id": "117", "dept": "งานเครื่องมือแพทย์", "prefix": "นางสาว", "fname": "เบญจวรรณ", "lname": "ฝ่ายอุบล"}, {"id": "118", "dept": "งานเครื่องมือแพทย์", "prefix": "นางสาว", "fname": "แพรวพรรณ", "lname": "วงค์จันทร์"}, {"id": "119", "dept": "งานเครื่องมือแพทย์", "prefix": "นาย", "fname": "ศุภกิติติ์", "lname": "พระภูมี"}, {"id": "120", "dept": "งานเครื่องมือแพทย์", "prefix": "นาย", "fname": "วุฒินันท์", "lname": "กุลจันทร์สี"}, {"id": "121", "dept": "งานเครื่องมือแพทย์", "prefix": "นาย", "fname": "นวพงษ์", "lname": "บ่อทอง"}, {"id": "122", "dept": "งานเครื่องมือแพทย์", "prefix": "นาย", "fname": "อภิวัฒน์", "lname": "ลีพฤติ"}, {"id": "124", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "อรดี", "lname": "ดวงมาลา"}, {"id": "125", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "วาสนา", "lname": "กองณรงค์"}, {"id": "126", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "วิไลวรรณ", "lname": "ชมภูยันต์"}, {"id": "127", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "เครือวัลย์", "lname": "แดนพิมสาย"}, {"id": "128", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "อรวรรณ", "lname": "ศรีพิทักษ์"}, {"id": "129", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "ไพทูน", "lname": "ทรงครักษ์"}, {"id": "130", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "หนูรัก", "lname": "วันทอง"}, {"id": "131", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "พรพรรณ", "lname": "สร้อยศิริ"}, {"id": "132", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "สมใจ", "lname": "สีกัน"}, {"id": "133", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "พัชรินทร์", "lname": "ตุแก้ว"}, {"id": "134", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "สมัย", "lname": "ทุมสะกะ"}, {"id": "135", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "รัศมี", "lname": "หอมทอง"}, {"id": "136", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "แอ๋ว", "lname": "ทรงครักษ์"}, {"id": "137", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ณัชชา", "lname": "อันทรง"}, {"id": "138", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ชญาพัฒน์", "lname": "ราชปึ"}, {"id": "139", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "น้ำฝน", "lname": "ตะหน่อง"}, {"id": "140", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "พัชรี", "lname": "จันทะ"}, {"id": "141", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "กนกพร", "lname": "เยี่ยมวิชิต"}, {"id": "142", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ปัญญา", "lname": "นาทอง"}, {"id": "143", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "มยุรี", "lname": "ประทุมวัน"}, {"id": "144", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "กิตติยา", "lname": "กิตติยา เฉลิมพล"}, {"id": "145", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "บุตรศรารัตน์", "lname": "เอียะรัมย์"}, {"id": "146", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ประยงค์", "lname": "ไตรทิพย์"}, {"id": "147", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ผ่องใส", "lname": "สาโรจน์"}, {"id": "148", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ทัศนีย์", "lname": "ล้านพุฒ"}, {"id": "149", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นาง", "fname": "บุบผา", "lname": "คำแสงทอง"}, {"id": "150", "dept": "กลุ่มงานแม่บ้านบริหาร", "prefix": "นางสาว", "fname": "ศศิธร", "lname": "สิงหวราช"}, {"id": "152", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "อรอุมา", "lname": "แพงหมั้น"}, {"id": "153", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "สุวรรณี", "lname": "ป้องศรี"}, {"id": "154", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "ปาริชาติ", "lname": "ผิวเฟื่อง"}, {"id": "155", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "สุปราณี", "lname": "แปวจันทึก"}, {"id": "156", "dept": "จ่ายกลาง", "prefix": "นาย", "fname": "เอกราช", "lname": "โพธิ์ผา"}, {"id": "157", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "อุษณา", "lname": "บุญเกษม"}, {"id": "158", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "ศิริลักษณ์", "lname": "ราชวงค์"}, {"id": "159", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "สุพรรณี", "lname": "ศรีเครือดง"}, {"id": "160", "dept": "จ่ายกลาง", "prefix": "นาย", "fname": "ธรรมรัตน์", "lname": "บุญมา"}, {"id": "161", "dept": "จ่ายกลาง", "prefix": "นาย", "fname": "ธนกิจ", "lname": "ศรีระกิจ"}, {"id": "162", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "นัฐพร", "lname": "เถิดตะถา"}, {"id": "163", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "อารียา", "lname": "สุขรี่"}, {"id": "164", "dept": "จ่ายกลาง", "prefix": "นางสาว", "fname": "สทธิดา", "lname": "ผาสุข"}, {"id": "166", "dept": "กลุ่มงานสารสนเทศทางการแพทย์", "prefix": "นาย", "fname": "ศิริศักดิ์", "lname": "ภูพันนา"}, {"id": "167", "dept": "กลุ่มงานสารสนเทศทางการแพทย์", "prefix": "นาย", "fname": "นิติเทพ", "lname": "ยมมูล"}, {"id": "168", "dept": "กลุ่มงานสารสนเทศทางการแพทย์", "prefix": "นาย", "fname": "ชำนาญ", "lname": "นันทะจักร์"}, {"id": "169", "dept": "กลุ่มงานสารสนเทศทางการแพทย์", "prefix": "นาย", "fname": "ปริญญา", "lname": "ลอยพิมาย"}, {"id": "170", "dept": "กลุ่มงานสารสนเทศทางการแพทย์", "prefix": "นาย", "fname": "ธิติ", "lname": "พันจำปา"}, {"id": "171", "dept": "กลุ่มงานสารสนเทศทางการแพทย์", "prefix": "นาย", "fname": "ประเมศวร์", "lname": "ฝ่ายอุบล"}, {"id": "173", "dept": "เวชระเบียน", "prefix": "นาง", "fname": "ศศิธร", "lname": "ผาลี"}, {"id": "174", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "ภัทรินทร", "lname": "สุวรรณเขต"}, {"id": "175", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "จุฑาทิพย์", "lname": "ดีแสน"}, {"id": "176", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "นุธิดา", "lname": "จันดา"}, {"id": "177", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "ปราณี", "lname": "ประเคนคะชา"}, {"id": "178", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "ชินากร", "lname": "ทองใคร้"}, {"id": "179", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "อภิชญา", "lname": "จันทะแสง"}, {"id": "180", "dept": "เวชระเบียน", "prefix": "นาย", "fname": "วัชวิชญ์", "lname": "ดำริห์"}, {"id": "181", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "สิริรัตน์", "lname": "พิมพ์กลม"}, {"id": "182", "dept": "เวชระเบียน", "prefix": "นาย", "fname": "วุฒิพงษ์", "lname": "จีนปรุ"}, {"id": "183", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "ปรียาพร", "lname": "พุฒาอามาตย์"}, {"id": "184", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "นุชรา", "lname": "อ่อนอำพันธ์"}, {"id": "185", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "ปวีณ์นุช", "lname": "สีอวน"}, {"id": "186", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "จันทร์ธิลา", "lname": "ศรีพลลา"}, {"id": "187", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "สุรินทรา", "lname": "ไชยเสือ"}, {"id": "188", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "ฐิตินันท์", "lname": "ฤาชา"}, {"id": "189", "dept": "เวชระเบียน", "prefix": "นาย", "fname": "ระพีพัฒน์", "lname": "มองโพธิ์"}, {"id": "190", "dept": "เวชระเบียน", "prefix": "นาย", "fname": "ทศพล", "lname": "พันจำปา"}, {"id": "191", "dept": "เวชระเบียน", "prefix": "นางสาว", "fname": "วิภาวดี", "lname": "ชัยแพทย์"}, {"id": "193", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นาง", "fname": "กัญญาภัค", "lname": "พันจำปา"}, {"id": "194", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "กษิรา", "lname": "ศรีเชียงขวาง"}, {"id": "195", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "ศุภาวรรณ", "lname": "พันโกฏิ"}, {"id": "196", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นาย", "fname": "สุรศักดิ์", "lname": "สีหะไตร"}, {"id": "197", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นาง", "fname": "หวานใจ", "lname": "วงศ์พงษ์คำ"}, {"id": "198", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นาย", "fname": "รุจิโรจน์", "lname": "บัวคำ"}, {"id": "199", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "พัชรินทร์", "lname": "โพธิ์คำ"}, {"id": "200", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "พิมผกา", "lname": "นาเมืองรักษ์"}, {"id": "201", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "นิตยา", "lname": "วิณะโรจน์"}, {"id": "202", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "นาฎยา", "lname": "เจาะจง"}, {"id": "203", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "เกศรินทร์", "lname": "ไชยปัญญา"}, {"id": "204", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "รุ้งระวี", "lname": "ดำริห์"}, {"id": "205", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นางสาว", "fname": "กมลวรรณ", "lname": "จันทร์หล่ม"}, {"id": "206", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นาง", "fname": "เจนจิรา", "lname": "ประไพรวงษ์"}, {"id": "207", "dept": "กลุ่มงานประกันสุขภาพ", "prefix": "นาย", "fname": "วีรยุทธ", "lname": "ราชบัญดิษฎ์"}, {"id": "209", "dept": "กลุ่มงานยุทธศาสตร์และแผนงานโครงการ", "prefix": "นางสาว", "fname": "อภัสษร", "lname": "สร้อยอุดม"}, {"id": "210", "dept": "กลุ่มงานยุทธศาสตร์และแผนงานโครงการ", "prefix": "นางสาว", "fname": "รัตติยากร", "lname": "ชาตรี"}, {"id": "212", "dept": "กลุ่มงานพัฒนาทรัพยากรบุคคล", "prefix": "นาง", "fname": "อภิญญา", "lname": "หาญธรรม"}, {"id": "213", "dept": "กลุ่มงานพัฒนาทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "นิศากร", "lname": "สิงหถิน"}, {"id": "214", "dept": "กลุ่มงานพัฒนาทรัพยากรบุคคล", "prefix": "นางสาว", "fname": "สิรินยา", "lname": "ดาวเรือง"}, {"id": "216", "dept": "งานโสตทัศนศึกษา", "prefix": "นาง", "fname": "ทิพย์วิมล", "lname": "วงษ์หนองแวง"}, {"id": "217", "dept": "งานโสตทัศนศึกษา", "prefix": "นาย", "fname": "ประสงค์ฤทธิ์", "lname": "จันทร์อ้วน"}, {"id": "218", "dept": "งานโสตทัศนศึกษา", "prefix": "นาย", "fname": "ภานุกร", "lname": "กองพิมพ์"}, {"id": "220", "dept": "ศูนย์คุณภาพ", "prefix": "นาย", "fname": "ณัฐพงศ์", "lname": "เผ่าไพศาล"}, {"id": "221", "dept": "ศูนย์คุณภาพ", "prefix": "นางสาว", "fname": "ทัศวรรณ", "lname": "ติดมา"}, {"id": "222", "dept": "ศูนย์คุณภาพ", "prefix": "นางสาว", "fname": "วรัญญา", "lname": "นุเคราะห์กัน"}, {"id": "224", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "พัฒนชัย", "lname": "วรรณกาล"}, {"id": "225", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "ทิวาภรณ์", "lname": "ทองแข็ง"}, {"id": "226", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "สุทัศ", "lname": "กัณหาชาลี"}, {"id": "227", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "พิณนภา", "lname": "บัวบาล"}, {"id": "228", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "สมัย", "lname": "จันทร์มณี"}, {"id": "229", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "ศุภานัน", "lname": "ขันอินทร์"}, {"id": "230", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "ปริศนา", "lname": "บุตตะ"}, {"id": "231", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "บังอร", "lname": "ไพรวัลย์"}, {"id": "232", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "ศิรินทิพย์", "lname": "สุวรรณไตร"}, {"id": "233", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "นภาพร", "lname": "คงจันทร์"}, {"id": "234", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "สุพิศ", "lname": "ทองปัญญา"}, {"id": "235", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "รัชนี", "lname": "ศรีสุนทร"}, {"id": "236", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "รณชัย", "lname": "ขวาญทอง"}, {"id": "237", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "อนุชา", "lname": "สารักษ์"}, {"id": "238", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "วันทนา", "lname": "ศรีสุนทร"}, {"id": "239", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "ณิรินทร์รดา", "lname": "คำสาว"}, {"id": "240", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "ณัฐพงศ์", "lname": "ไกรมณี"}, {"id": "241", "dept": "โภชนศาสตร์", "prefix": "นางสาว", "fname": "นิตยา", "lname": "คำสมหมาย"}, {"id": "242", "dept": "โภชนศาสตร์", "prefix": "นาย", "fname": "สุวิทย์", "lname": "ตรงใจ"}, {"id": "244", "dept": "กลุ่มการพยาบาล", "prefix": "นาง", "fname": "นางเสาวนีย์", "lname": "ดีวะลา"}, {"id": "245", "dept": "กลุ่มการพยาบาล", "prefix": "นางสาว", "fname": "ชริษา", "lname": "ไตรธนาภัทร"}, {"id": "246", "dept": "กลุ่มการพยาบาล", "prefix": "นางสาว", "fname": "สมรักษ์", "lname": "บรรณจิตร์"}, {"id": "247", "dept": "กลุ่มการพยาบาล", "prefix": "นางสาว", "fname": "สุพรรณี", "lname": "ผิวไธสง"}, {"id": "249", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "อนาวิน", "lname": "ประภาวงศ์"}, {"id": "250", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "วิจิตราภรณ์", "lname": "อ่อนราษฎร์"}, {"id": "251", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "สมปอง", "lname": "พันธ์ด้วง"}, {"id": "252", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "ฤทัยรัตน์", "lname": "อินทร์มียืน"}, {"id": "253", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "ทิพวรรณ", "lname": "แหนไธสง"}, {"id": "254", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "รัญดร", "lname": "แสนอามาตร์"}, {"id": "255", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "รัตติยา", "lname": "ทวีโชติ"}, {"id": "256", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "อาทิตย์", "lname": "เพ็งทอง"}, {"id": "257", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาง", "fname": "วิลาสินี", "lname": "พลมั่น"}, {"id": "258", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "พัชราวรรณ", "lname": "สุวรรณไตร"}, {"id": "259", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "ครรชิต", "lname": "สายแก้ว"}, {"id": "260", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว.", "fname": "กาญจนา", "lname": "ชารี"}, {"id": "261", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาง", "fname": "จินตนา", "lname": "สุโพธิ์ภาค"}, {"id": "262", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "ณัฐวดี", "lname": "สกุลิมงค์"}, {"id": "263", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "อารีรัตน์", "lname": "จันทะพันธ์"}, {"id": "264", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "สุวนันท์", "lname": "พรมสิทธิ์"}, {"id": "265", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "สุดารัตน์", "lname": "ทองใคร้"}, {"id": "266", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "เอกพงษ์", "lname": "ผาลี"}, {"id": "267", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "หทัยรัตน์", "lname": "เข็มศรี"}, {"id": "268", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "จินตนา", "lname": "เกตุพิมล"}, {"id": "269", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "วิเชียร", "lname": "โพธิ์ชุม"}, {"id": "270", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "ไพลิน", "lname": "อินโยธา"}, {"id": "271", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "สุภาพรรณ", "lname": "ไกรราช"}, {"id": "272", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "รัชนก", "lname": "ศรีราช"}, {"id": "273", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "อัทธยา", "lname": "สะท้านถิ่น"}, {"id": "274", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "ทวิปิญา", "lname": "โคมทอง"}, {"id": "275", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นางสาว", "fname": "สุทธิดา", "lname": "กลิ่นเกษร"}, {"id": "276", "dept": "เทคนิคการแพทย์(LAB)", "prefix": "นาย", "fname": "วัชรพร", "lname": "ขรุจันทร์"}, {"id": "279", "dept": "งานรังสี ( X-ray )", "prefix": "นาย", "fname": "สุริยา", "lname": "โสชมภู"}, {"id": "280", "dept": "งานรังสี ( X-ray )", "prefix": "นาง", "fname": "นฏกรศมน", "lname": "วันตา"}, {"id": "281", "dept": "งานรังสี ( X-ray )", "prefix": "นางสาว", "fname": "สมยงค์", "lname": "นิกรเทศ"}, {"id": "282", "dept": "งานรังสี ( X-ray )", "prefix": "นาย", "fname": "อริยะ", "lname": "วงค์จันทร์"}, {"id": "283", "dept": "งานรังสี ( X-ray )", "prefix": "นางสาว", "fname": "ภัสดา", "lname": "ศรีชาทุม"}, {"id": "284", "dept": "งานรังสี ( X-ray )", "prefix": "นาย", "fname": "สถิตย์", "lname": "ชัยจันทร์"}, {"id": "285", "dept": "งานรังสี ( X-ray )", "prefix": "นาย", "fname": "ลือชัย", "lname": "พิลา"}, {"id": "286", "dept": "งานรังสี ( X-ray )", "prefix": "นาย", "fname": "เฉลิมศิริ", "lname": "สุขศร"}, {"id": "287", "dept": "งานรังสี ( X-ray )", "prefix": "นางสาว", "fname": "นลินนิภา", "lname": "ญาติคำ"}, {"id": "288", "dept": "งานรังสี ( X-ray )", "prefix": "นางสาว", "fname": "ณัฐธิชา", "lname": "สันประเทียบ"}, {"id": "291", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นางสาว", "fname": "นันทนา", "lname": "เสียงล้ำ"}, {"id": "292", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นาย", "fname": "มนเทียน", "lname": "เอกสามารถ"}, {"id": "293", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นาย", "fname": "สิรวิชญ์", "lname": "พันธนา"}, {"id": "294", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นาง", "fname": "จิรภัทร", "lname": "นุพิมพ์"}, {"id": "295", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นางสาว", "fname": "อังศุมาลิน", "lname": "ยิ่งยืน"}, {"id": "296", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นางสาว", "fname": "พรนภัส", "lname": "จุรีมาศ"}, {"id": "297", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นางสาว", "fname": "อัสมา", "lname": "โพธิราชา"}, {"id": "298", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นาย", "fname": "ภัทรพงศ์", "lname": "แสนอุบล"}, {"id": "299", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นาย", "fname": "เจษฎา", "lname": "กาญจนวงษา"}, {"id": "300", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นาย", "fname": "ทวิช", "lname": "โมระพัฒน์"}, {"id": "301", "dept": "เภสัชกรรม(บน)", "prefix": "นางสาว", "fname": "ศศิธร", "lname": "โพธินาม"}, {"id": "302", "dept": "เภสัชกรรม(บน)", "prefix": "นางสาว", "fname": "ณิชา", "lname": "ทองแสนไตร"}, {"id": "303", "dept": "เภสัชกรรม(บน)", "prefix": "นางสาว", "fname": "ปนัดดา", "lname": "เหล่ามูล"}, {"id": "304", "dept": "เภสัชกรรม(บน)", "prefix": "นางสาว", "fname": "กิติยากร", "lname": "แพงสอน"}, {"id": "305", "dept": "เภสัชกรรมชุมชน (บน)", "prefix": "นางสาว", "fname": "ปาณิสรา", "lname": "หาญธรรม"}, {"id": "306", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "พิชญา", "lname": "มาลาศรี"}, {"id": "307", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นาง", "fname": "ปิยะภากร", "lname": "ผลภิญโญ"}, {"id": "308", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "สุภัทรา", "lname": "ลามี"}, {"id": "309", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นาย", "fname": "วัชระ", "lname": "สำโรง"}, {"id": "310", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "รวิภา", "lname": "ชัยจันทร์"}, {"id": "311", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "พรธิวา", "lname": "สีแสง"}, {"id": "312", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นาย", "fname": "ธีรวัฒน์", "lname": "สวยสมเรียม"}, {"id": "313", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นาย", "fname": "วุฒิศักดิ์", "lname": "วุฒิสาร"}, {"id": "314", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "ชมัยพร (นก)", "lname": "ปาวะลี"}, {"id": "315", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นาง", "fname": "อรุณรัตน์", "lname": "มณีทอง"}, {"id": "316", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "รุ่งนภา", "lname": "สิทธิศักดิ์"}, {"id": "317", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "สุภาพร", "lname": "จันทร์มีศรี"}, {"id": "318", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "ไอน้ำ", "lname": "เรืองโพน"}, {"id": "319", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "ศิรินาถ", "lname": "พิศภาร"}, {"id": "320", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "วิลาวัลย์", "lname": "มะโฮงชัย"}, {"id": "321", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "สุจิตรา", "lname": "ธนพิณศิริ"}, {"id": "322", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "กิติยากร", "lname": "แพงสอน"}, {"id": "323", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นางสาว", "fname": "บุณยนุช", "lname": "ไกรรัตน์"}, {"id": "324", "dept": "เภสัชกรรมชุมชน (บน,ล่าง)", "prefix": "นาย", "fname": "ชานนท์", "lname": "ทิ้งแสน"}, {"id": "327", "dept": "กายภาพบำบัด", "prefix": "นาง", "fname": "ศศิรฎา", "lname": "ด่านระหาญ"}, {"id": "328", "dept": "กายภาพบำบัด", "prefix": "นาง", "fname": "ป้อม", "lname": "พันธุ์พรม"}, {"id": "329", "dept": "กายภาพบำบัด", "prefix": "นางสาว", "fname": "กิติยา", "lname": "รักษาพล"}, {"id": "330", "dept": "กายภาพบำบัด", "prefix": "นางสาว", "fname": "ปนัดดา", "lname": "นันท์ดี"}, {"id": "331", "dept": "กายภาพบำบัด", "prefix": "นาย", "fname": "ธนบดี", "lname": "บึงกาญจนา"}, {"id": "332", "dept": "กายภาพบำบัด", "prefix": "นาย", "fname": "ศิริภัทร", "lname": "นามโคตร"}, {"id": "333", "dept": "กายภาพบำบัด", "prefix": "นางสาว", "fname": "จีรวรรณ", "lname": "กัญญาพันธ์"}, {"id": "334", "dept": "กายภาพบำบัด", "prefix": "นางสาว", "fname": "ปาณิตา", "lname": "วงษ์หาบุตร"}, {"id": "335", "dept": "กายภาพบำบัด", "prefix": "นางสาว", "fname": "ดวงกมล", "lname": "ชาติสง่า"}, {"id": "338", "dept": "ห้องผ่าตัด", "prefix": "นาง", "fname": "นัยนา", "lname": "ผาณิบุศย์"}, {"id": "339", "dept": "ห้องผ่าตัด", "prefix": "นาง", "fname": "มาริศา", "lname": "แสงอาคม"}, {"id": "340", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "อนงค์", "lname": "พ่อสาร"}, {"id": "341", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ปรียาสิริ", "lname": "คำอุเทน"}, {"id": "342", "dept": "ห้องผ่าตัด", "prefix": "นาง", "fname": "ณฐกันต์", "lname": "นันทศร"}, {"id": "343", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "นายวัชระ", "lname": "ไชมาคำ"}, {"id": "344", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ธันยา", "lname": "สง่าเนตร"}, {"id": "345", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "พนัสดา", "lname": "ขอดอนุ"}, {"id": "346", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "พรสุดา", "lname": "สมบูรณ์"}, {"id": "347", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "รุ่งฤทธิ์", "lname": "แฮด"}, {"id": "348", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "สุดารัตน์", "lname": "ชาลี"}, {"id": "349", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "จิตราภรณ์", "lname": "จันทะผล"}, {"id": "350", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "อรปรียา", "lname": "พลทำ"}, {"id": "351", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "จิราพรรณ", "lname": "พลภักดี"}, {"id": "352", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "สุกัญญา", "lname": "สีคำภา"}, {"id": "353", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ดรุณี", "lname": "เชื้อวังคำ"}, {"id": "354", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "กิตติชัย", "lname": "แขสระน้อย"}, {"id": "355", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "สุรีฉาย", "lname": "สระแก้ว"}, {"id": "356", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "วิสุตา", "lname": "วิทเวช"}, {"id": "357", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "จิดาภา", "lname": "พรมจันทร์"}, {"id": "358", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ราตรี", "lname": "พูนบำรุง"}, {"id": "359", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "อุไรรัตน์", "lname": "มีเหง้า"}, {"id": "360", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "ธงชัย", "lname": "ฮาบสุวรรณ"}, {"id": "361", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "ธวัชชัย", "lname": "ภูเมฆ"}, {"id": "362", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "กิตตกร", "lname": "ฤทธิศักดิ์"}, {"id": "363", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "ธัชนนท์", "lname": "เจริญผล"}, {"id": "364", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "พรชิตา", "lname": "พงษ์สระพัง"}, {"id": "365", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "สันติ", "lname": "สาฝ่าย"}, {"id": "366", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "รัตธญา", "lname": "พรมอุนารถ"}, {"id": "367", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "กฤษฎา", "lname": "ละอองศรี"}, {"id": "368", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ปิยะดา", "lname": "คำมาทิตย์"}, {"id": "369", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "สุรชัย", "lname": "บัวชา"}, {"id": "370", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "ศรุยุทธ", "lname": "อุ่นวงศ์"}, {"id": "371", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "สุพัตรา", "lname": "พิมสุวรรณ"}, {"id": "372", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ภาระดา", "lname": "ตื้อเชียง"}, {"id": "373", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "นันทกร", "lname": "ฤกษ์จันทร์"}, {"id": "374", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ขวัญชนก", "lname": "อองตัน"}, {"id": "375", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ชมพูนุท", "lname": "รูปน้อย"}, {"id": "376", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ภาราดา", "lname": "เขียวชัยภูมิ"}, {"id": "377", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "วิลาวรรณ", "lname": "ชินคำ"}, {"id": "378", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "สุดารัตน์", "lname": "ทองเจริญ"}, {"id": "379", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "ศศิภา", "lname": "แสงกระจ่าง"}, {"id": "380", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "พัชรี", "lname": "จันทร์ศรีนวล"}, {"id": "381", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "วิลาวรรณ", "lname": "ชินคำ"}, {"id": "382", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "สุพัตรา", "lname": "พิมสุวรรณ"}, {"id": "383", "dept": "ห้องผ่าตัด", "prefix": "นาย", "fname": "นันทกร", "lname": "ฤกษ์จันทร์"}, {"id": "384", "dept": "ห้องผ่าตัด", "prefix": "นางสาว", "fname": "พัชรี", "lname": "จันทร์ศรีนวล"}, {"id": "387", "dept": "งานวิสัญญี", "prefix": "นาง", "fname": "ภัทรวดี", "lname": "อสุรินทร์"}, {"id": "388", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "สุรีรัตน์", "lname": "วันตา"}, {"id": "389", "dept": "งานวิสัญญี", "prefix": "นาง", "fname": "ทานตะวัน", "lname": "เกตุจำนงค์"}, {"id": "390", "dept": "งานวิสัญญี", "prefix": "นาง", "fname": "โชติกา", "lname": "ไชยธงรัตน์"}, {"id": "391", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "นิรมล", "lname": "เร็ดเต้"}, {"id": "392", "dept": "งานวิสัญญี", "prefix": "นาง", "fname": "วรรณี", "lname": "ไชยพร"}, {"id": "393", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "ปุณฑริก", "lname": "โพนสิงห์"}, {"id": "394", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "สุพรรณี", "lname": "ไชมาคำ"}, {"id": "395", "dept": "งานวิสัญญี", "prefix": "นาย", "fname": "สันติพงศ์", "lname": "ไชยฤทธิ์"}, {"id": "396", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "ผกามาศ", "lname": "อินทรสิทธิ์"}, {"id": "397", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "ปพัส", "lname": "เสียงล้ำ"}, {"id": "398", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "เจนจิรา", "lname": "สุโพธิ์เคน"}, {"id": "399", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "ศิริลักษ์", "lname": "ปัดสำราญ"}, {"id": "400", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "กานดา", "lname": "สืบมา"}, {"id": "401", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "วราภรณ์", "lname": "สัจจะสังข์"}, {"id": "402", "dept": "งานวิสัญญี", "prefix": "นาย", "fname": "ราชันย์", "lname": "ราโชธร"}, {"id": "403", "dept": "งานวิสัญญี", "prefix": "นาย", "fname": "เชาว์วรรธน์", "lname": "นิจภักดี"}, {"id": "404", "dept": "งานวิสัญญี", "prefix": "นาย", "fname": "ภีรพรรณ์", "lname": "คนขยัน"}, {"id": "405", "dept": "งานวิสัญญี", "prefix": "นางสาว", "fname": "จิรานันท์", "lname": "สุวรรณวงค์"}, {"id": "406", "dept": "งานวิสัญญี", "prefix": "นาย", "fname": "กัมพล", "lname": "พันธ์ละออ"}, {"id": "407", "dept": "งานวิสัญญี", "prefix": "นาย", "fname": "ชลที", "lname": "ศรีชัยมูล"}, {"id": "410", "dept": "ห้องคลอด", "prefix": "นาง", "fname": "ปัญชนันท์", "lname": "คำวงษา"}, {"id": "411", "dept": "ห้องคลอด", "prefix": "นาง", "fname": "วีรดา", "lname": "สุวะมาตย์"}, {"id": "412", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "รัตนาภรณ์", "lname": "โพธิ์พรม"}, {"id": "413", "dept": "ห้องคลอด", "prefix": "นาง", "fname": "จิรภา", "lname": "ธรรมสาร"}, {"id": "414", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "ณัฎฐธินันท์", "lname": "ชินคำ"}, {"id": "415", "dept": "ห้องคลอด", "prefix": "นาง", "fname": "ฐิติกานต์", "lname": "บริบูรณ์"}, {"id": "416", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "กมลชนก", "lname": "สิงบุดดี"}, {"id": "417", "dept": "ห้องคลอด", "prefix": "นาง", "fname": "บังอร", "lname": "ศรีวงษา"}, {"id": "418", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "จรัญญา", "lname": "ทุมนา"}, {"id": "419", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "ปนัดดา", "lname": "พลดาหาญ"}, {"id": "420", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "เปรมวดี", "lname": "โสมอินทร์"}, {"id": "421", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "ณิฤญาดา", "lname": "ช่วยยา"}, {"id": "422", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "นรินทร", "lname": "พินิจมนตรี"}, {"id": "423", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "เกตน์สิรี", "lname": "จู่มา"}, {"id": "424", "dept": "ห้องคลอด", "prefix": "นางสาว", "fname": "เปรมกมล", "lname": "พลโยราช"}, {"id": "427", "dept": "โภชนาการ", "prefix": "นาย", "fname": "พัฒนชัย", "lname": "วรรณกาล"}, {"id": "428", "dept": "โภชนาการ", "prefix": "นางสาว", "fname": "ทิวาภรณ์", "lname": "ทองแข็ง"}, {"id": "429", "dept": "โภชนาการ", "prefix": "นางสาว", "fname": "จิราพร", "lname": "จันทร์อ้วน"}, {"id": "430", "dept": "โภชนาการ", "prefix": "นางสาว", "fname": "นิตญา", "lname": "คำสมหมาย"}, {"id": "433", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "สถาพร", "lname": "โมราราช"}, {"id": "434", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ปรีเปรม", "lname": "ศรีหล่มศักดิ์"}, {"id": "435", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "สุชีวา", "lname": "ราชูโส"}, {"id": "436", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "วรุตม์", "lname": "ชมภูจันทร์"}, {"id": "437", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "อรนภา", "lname": "เพ็งทอง"}, {"id": "438", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "ครองธรรม", "lname": "รักคง"}, {"id": "439", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "สุภัทรวดี", "lname": "ภูมิพื้น"}, {"id": "440", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ณิชาภัทร", "lname": "ธารธเนศ"}, {"id": "441", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ระพีพร", "lname": "ศิลาคม"}, {"id": "442", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "พลอยไพลิน", "lname": "ธนาภินันท์"}, {"id": "443", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "กนกกาญจน์", "lname": "มหาวีรวัฒน์"}, {"id": "444", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "สโรชา", "lname": "อังวิทยาธร"}, {"id": "445", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ปาริชาติ", "lname": "ดิษฐ์สมบูรณ์"}, {"id": "446", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "โชติกา", "lname": "สิงหกุล"}, {"id": "447", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "แสงอาทิตย์", "lname": "ศรีปากดี"}, {"id": "448", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "แคทรียา", "lname": "จันดาบุตร"}, {"id": "449", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "นพรัตน์", "lname": "ภูธรราช"}, {"id": "450", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "ศิวศิษฏ์", "lname": "ชุมพล"}, {"id": "451", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "มานิต", "lname": "อินธิราช"}, {"id": "452", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ศศินี", "lname": "แก้วลา"}, {"id": "453", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "ธราดล", "lname": "มุ่งขันติวงศากุล"}, {"id": "454", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ฉัฑริกา", "lname": "เพียเฮียง"}, {"id": "455", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "กฤติยา", "lname": "จงสกุตกวงศ์"}, {"id": "456", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ปรียาพร", "lname": "อินทร์เคน"}, {"id": "457", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "สาลินี", "lname": "พลโยธา"}, {"id": "458", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "กรรณเอนก", "lname": "หนุนแหลมทอง"}, {"id": "459", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "เขตโสภณ", "lname": "ปูชิตภากรณ์"}, {"id": "460", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "พีระวัฒน์", "lname": "คำจุมพล"}, {"id": "461", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ชญากาณฑ์", "lname": "พันธรักษ์"}, {"id": "462", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "วรุณประภา", "lname": "วรสาร"}, {"id": "463", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ชฎาทิพย์", "lname": "วัฒนกิติกุล"}, {"id": "464", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "ชมดาว", "lname": "ชมเดช"}, {"id": "465", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "ปฐวี", "lname": "วรรณกิ่ง"}, {"id": "466", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "วนัชพร", "lname": "ศรีเมือง"}, {"id": "467", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "สัณฑ์", "lname": "แจ้งวัง"}, {"id": "468", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "อภิชล", "lname": "ภักดีสุวรรณ"}, {"id": "469", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "รมิดา", "lname": "โคตรพรหม"}, {"id": "470", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "กวินธิดา", "lname": "สุทธิ"}, {"id": "471", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "นันธิยา", "lname": "พินิจกลาง"}, {"id": "472", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "สุปวีณ์", "lname": "ฤกษ์ยินดี"}, {"id": "473", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "พีรพัฒน์", "lname": "ภูมิแก้ว"}, {"id": "474", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "ฐานวัฒน์", "lname": "ฐาปนะพงศ์"}, {"id": "475", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "จรรยพร", "lname": "โรจน์ประสิทธิ์พร"}, {"id": "476", "dept": "องค์กรแพทย์", "prefix": "นพ.", "fname": "วรินทร", "lname": "แซ่อั๊ง"}, {"id": "477", "dept": "องค์กรแพทย์", "prefix": "พญ.", "fname": "นภัสนันท์", "lname": "ศิริเนตรเมธีกุล"}, {"id": "480", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "นนลญา", "lname": "สุวรรณไตร"}, {"id": "481", "dept": "ไตเทียม", "prefix": "นาง", "fname": "ปุณนภา", "lname": "อยู่พงษ์"}, {"id": "482", "dept": "ไตเทียม", "prefix": "นาย", "fname": "ธีรเดช", "lname": "ชัยยุราช"}, {"id": "483", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "ปฏิญญา", "lname": "คำภูษา"}, {"id": "484", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "ณัฐธิชา", "lname": "ภูเรียนรมย์"}, {"id": "485", "dept": "ไตเทียม", "prefix": "นาย", "fname": "ประทีป", "lname": "สุขรี่"}, {"id": "486", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "นีรนุช", "lname": "โชติกวี"}, {"id": "487", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "ปาณิศา", "lname": "วงษาบุตร"}, {"id": "488", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "วันวิสาข์", "lname": "ใฝ่ชำนาญ"}, {"id": "489", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "อภิวันท์", "lname": "มะลิต้น"}, {"id": "490", "dept": "ไตเทียม", "prefix": "นาย", "fname": "สมศักดิ์", "lname": "นามวงศ์"}, {"id": "491", "dept": "ไตเทียม", "prefix": "นาย", "fname": "รัชนัย", "lname": "สมงาม"}, {"id": "492", "dept": "ไตเทียม", "prefix": "นาย", "fname": "นนทวัฒน์", "lname": "แสงเพ็ชร์"}, {"id": "493", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "รัตนากรณ์", "lname": "จิตกุศล"}, {"id": "494", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "นุจรินทร์", "lname": "บุตรทน"}, {"id": "495", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "จุฑามาศ", "lname": "บุตรสารคำ"}, {"id": "496", "dept": "ไตเทียม", "prefix": "นางสาว", "fname": "ชยลักษณ์", "lname": "ราศี"}, {"id": "499", "dept": "ศูนย์รับแจ้งเหตุและสั่งการ(EMS)", "prefix": "นางสาว", "fname": "อรชร", "lname": "ประเคนคะชา"}, {"id": "500", "dept": "ศูนย์รับแจ้งเหตุและสั่งการ(EMS)", "prefix": "นางสาว", "fname": "วรรณศิริ", "lname": "เหรียญทอง"}, {"id": "501", "dept": "ศูนย์รับแจ้งเหตุและสั่งการ(EMS)", "prefix": "นางสาว", "fname": "กฤษณวรรณ", "lname": "คำสวัสดิ์"}, {"id": "502", "dept": "ศูนย์รับแจ้งเหตุและสั่งการ(EMS)", "prefix": "นาย", "fname": "เหรียญชัย", "lname": "ศรีสงคราม"}, {"id": "503", "dept": "ศูนย์รับแจ้งเหตุและสั่งการ(EMS)", "prefix": "นาย", "fname": "สุดสาคร", "lname": "อะโคตรมี"}, {"id": "506", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "กิ่งฟ้า", "lname": "ศรีวังโพน"}, {"id": "507", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "พัชรนุช", "lname": "แก้วลี"}, {"id": "508", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "สุภัทรา", "lname": "จ่ายกระโทก"}, {"id": "509", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "วรรณพร", "lname": "ภักดีไทย"}, {"id": "510", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "อริสา", "lname": "สวนเกตุ"}, {"id": "511", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นาย", "fname": "ทนงศักดิ์", "lname": "ติดมา"}, {"id": "512", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ยุพวรรณ", "lname": "โพธารินทร์"}, {"id": "513", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "อรอุมา", "lname": "ลือเลี้ยง"}, {"id": "514", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "สารินี", "lname": "สีเฒ่า"}, {"id": "515", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ขวัญภิรมย์", "lname": "ไตรถิ่น"}, {"id": "516", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "พรชนก", "lname": "หงษ์ชูตา"}, {"id": "517", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ชนัญชิดา", "lname": "ธิสานนท์"}, {"id": "518", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ปิญชาน์", "lname": "ทองคำ"}, {"id": "519", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "สารินี", "lname": "สีเฒ่า"}, {"id": "522", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นางสาว", "fname": "ทิพากร", "lname": "ศรีแก่น"}, {"id": "523", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นาง", "fname": "วาสนา", "lname": "พุฒช่อ"}, {"id": "524", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นางสาว", "fname": "เสาวลักษณ์", "lname": "ทองจันทร์"}, {"id": "525", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นางสาว", "fname": "วีนัส", "lname": "โพธิจักร"}, {"id": "526", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นางสาว", "fname": "ชยุดา", "lname": "รักษาเมือง"}, {"id": "527", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นางสาว", "fname": "นงเยาว์", "lname": "ทุ่งนาทัด"}, {"id": "528", "dept": "OPDสูติ-นรีเวชกรรม", "prefix": "นางสาว", "fname": "อุมาภรณ์", "lname": "กัณหา"}, {"id": "529", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "นุชรินทร์", "lname": "อุ่นคำ"}, {"id": "530", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "กุสุมา", "lname": "วังทะพันธ์"}, {"id": "531", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "นาทธิกา", "lname": "ชูราศี"}, {"id": "532", "dept": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ปิญชาน์", "lname": "ทองคำ"}, {"id": "535", "dept": "คลีนิคอายุรกรรม", "prefix": "นาง", "fname": "กุลธิดา", "lname": "ทีหอคำ"}, {"id": "536", "dept": "คลีนิคอายุรกรรม", "prefix": "นาง", "fname": "ณิชานันท์", "lname": "มาสิงห์บุญ"}, {"id": "537", "dept": "คลีนิคอายุรกรรม", "prefix": "นาง", "fname": "นฤทัย", "lname": "จันทร์อ้วน"}, {"id": "538", "dept": "คลีนิคอายุรกรรม", "prefix": "นางสาว", "fname": "นีรนุช", "lname": "แพงมาพรม"}, {"id": "539", "dept": "คลีนิคอายุรกรรม", "prefix": "นาง", "fname": "พัชราพร", "lname": "สุดตา"}, {"id": "540", "dept": "คลีนิคอายุรกรรม", "prefix": "นางสาว", "fname": "กฤษณวรรณ", "lname": "คำสวัสดิ์"}, {"id": "541", "dept": "คลีนิคอายุรกรรม", "prefix": "นาง", "fname": "เจนจิรา", "lname": "ประไพวงษ์"}, {"id": "542", "dept": "คลีนิคอายุรกรรม", "prefix": "นางสาว", "fname": "รักคณา", "lname": "ราโชธร"}, {"id": "543", "dept": "คลีนิคอายุรกรรม", "prefix": "นาง", "fname": "พิชญาภา", "lname": "อุ่นละม้าย"}, {"id": "544", "dept": "คลีนิคอายุรกรรม", "prefix": "นางสาว", "fname": "นงคราญ", "lname": "จันทร์งาม"}, {"id": "545", "dept": "คลีนิคอายุรกรรม", "prefix": "นางสาว", "fname": "กัญญาภรณ์", "lname": "พรมพิมพ์"}, {"id": "546", "dept": "คลีนิคอายุรกรรม", "prefix": "นางสาว", "fname": "กานต์ธิดา", "lname": "ผลาโชติ"}, {"id": "549", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "วิลาสินี", "lname": "พลเสนา"}, {"id": "550", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "ฐปนัท", "lname": "หอมสมบัติ"}, {"id": "551", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "มณีรัตน์", "lname": "พูลเพิ่ม"}, {"id": "552", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "ภาวิณี", "lname": "ศรีสุชาติ"}, {"id": "553", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "วิลาวัลย์", "lname": "ชินบุตร"}, {"id": "554", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "ดารุณี", "lname": "โพธิ์มูล"}, {"id": "555", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นาย", "fname": "วุฒิชัย", "lname": "นาสิงเตา"}, {"id": "556", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "จุฑามาศ", "lname": "บุญมา"}, {"id": "557", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "ภาคินี", "lname": "กอแก้ว"}, {"id": "558", "dept": "OPDสุขภาพจิตและยาเสพติด", "prefix": "นางสาว", "fname": "เนตรดาว", "lname": "ด่านทองศรี"}, {"id": "561", "dept": "งานให้คำปรึกษา(คลีนิคนภา)", "prefix": "นาย", "fname": "ชัยกฤต", "lname": "ดีวะลา"}, {"id": "562", "dept": "งานให้คำปรึกษา(คลีนิคนภา)", "prefix": "นางสาว", "fname": "สุพัตรา", "lname": "สุขเกษม"}, {"id": "563", "dept": "งานให้คำปรึกษา(คลีนิคนภา)", "prefix": "นางสาว", "fname": "ขวัญลดา", "lname": "ขุลิดี"}, {"id": "564", "dept": "งานให้คำปรึกษา(คลีนิคนภา)", "prefix": "นางสาว", "fname": "พรวิภา", "lname": "อินทร์แสง"}, {"id": "567", "dept": "ตึกตา/จักษุ", "prefix": "นาง", "fname": "ลุนนี", "lname": "ใจมั่น"}, {"id": "568", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "วิจิตรา", "lname": "เสียงล้ำ"}, {"id": "569", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "ธนิดา", "lname": "ไล่เขีย"}, {"id": "570", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "วริศรา", "lname": "วงษ์หาบุตร"}, {"id": "571", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "สุภัตรา", "lname": "ซาแก้ว"}, {"id": "572", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "มัทธนา", "lname": "ศรีหาวงค์"}, {"id": "573", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "ศิริประภา", "lname": "กรมวังก้อน"}, {"id": "574", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "นิภารัตน์", "lname": "แก่นจันทร์"}, {"id": "575", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "ศิรินประภา", "lname": "กรมวังก้อน"}, {"id": "576", "dept": "ตึกตา/จักษุ", "prefix": "นางสาว", "fname": "ชญานภัส", "lname": "เสนานาม"}, {"id": "579", "dept": "คลินิก ARI/ฉีดยาทำแผล", "prefix": "นาง", "fname": "เสาวณิต", "lname": "อาจจันดา"}, {"id": "580", "dept": "คลินิก ARI/ฉีดยาทำแผล", "prefix": "นางสาว", "fname": "ราวรรณ", "lname": "จำปา"}, {"id": "581", "dept": "คลินิก ARI/ฉีดยาทำแผล", "prefix": "นาง", "fname": "รุ่งนภา", "lname": "ก่ำลาดนาง"}, {"id": "582", "dept": "คลินิก ARI/ฉีดยาทำแผล", "prefix": "นางสาว", "fname": "ชาลินี", "lname": "คะสีทอง"}, {"id": "585", "dept": "OPDศัลยกรรมระบบทางเดินปัสสาวะ", "prefix": "นาย", "fname": "อภิรักษ์", "lname": "สร้อยคำ"}, {"id": "586", "dept": "OPDศัลยกรรมระบบทางเดินปัสสาวะ", "prefix": "นาง", "fname": "สุธิดา", "lname": "วงษ์คงคำ"}, {"id": "587", "dept": "OPDศัลยกรรมระบบทางเดินปัสสาวะ", "prefix": "นางสาว", "fname": "วิไลภรณ์", "lname": "ไชยฤทธิ์"}, {"id": "588", "dept": "OPDศัลยกรรมระบบทางเดินปัสสาวะ", "prefix": "นาง", "fname": "นวลพัชร์", "lname": "ใจอ่อน"}, {"id": "589", "dept": "OPDศัลยกรรมระบบทางเดินปัสสาวะ", "prefix": "นาง", "fname": "อัมพร", "lname": "ดวงมาลัย"}, {"id": "592", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "วัลย์ลดา", "lname": "สุริยะกาญจน์"}, {"id": "593", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ชนัฐปภา", "lname": "สุแพง"}, {"id": "594", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นาย", "fname": "จิรวัฒน์", "lname": "พันจำปา"}, {"id": "595", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นาง", "fname": "อรัญญา", "lname": "ลำพุทธา"}, {"id": "596", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ศริณญา", "lname": "ดวงมาลา"}, {"id": "597", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "พรชนก", "lname": "หงส์ชูตา"}, {"id": "598", "dept": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "prefix": "นางสาว", "fname": "ชนัญชิดา", "lname": "ธิสานนท์"}, {"id": "601", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นาง", "fname": "จุฑารัตน์", "lname": "สุริยะกาญจน์"}, {"id": "602", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "สุภัทรา", "lname": "ศิริเมือง"}, {"id": "603", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "หฤทัย", "lname": "คะดุน"}, {"id": "604", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "ชุติมา", "lname": "เตียเจริญ"}, {"id": "605", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นาย", "fname": "รวีวัฒน์", "lname": "จริยรัตน์"}, {"id": "606", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "มณฑาทิพย์", "lname": "ธนชัยกุล"}, {"id": "607", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "พัชริดา", "lname": "นิยมสัตย์"}, {"id": "608", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นาย", "fname": "ชัยวุฒิ", "lname": "ไชยต้นเทือก"}, {"id": "609", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "รสกร", "lname": "สิมมาลา"}, {"id": "610", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "นภาพร", "lname": "เชียงคำ"}, {"id": "611", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "เยาวภา", "lname": "ไลไธสง"}, {"id": "612", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "กนกวรรณ", "lname": "จันทร์โนนแซง"}, {"id": "613", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "พิชญ์ศินี", "lname": "แซงสีนวล"}, {"id": "614", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "สุจิตรา", "lname": "วงษ์กระโซ่"}, {"id": "615", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "กัญญารัตน์", "lname": "เล็ดเต้"}, {"id": "616", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "อรทัย", "lname": "วงค์อินอยู่"}, {"id": "617", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "สุธาศิณี", "lname": "คำเงิน"}, {"id": "618", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "ศิริญญา", "lname": "หาผล"}, {"id": "619", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "อินทร์ธิรา", "lname": "บุญมีบุตร"}, {"id": "620", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "เยาวเรศ", "lname": "อาทิตย์ตั้ง"}, {"id": "621", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "เพ็ญศิริ", "lname": "ทองดีนอก"}, {"id": "622", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "วัชราภรณ์", "lname": "บรรณบดี"}, {"id": "623", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "อุไรวรรณ", "lname": "เสาะสืบงาม"}, {"id": "624", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นาง", "fname": "วิภา", "lname": "ชัยจันทร์"}, {"id": "625", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "วิสุดา", "lname": "แซงสี"}, {"id": "626", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "ปาริชาติ", "lname": "นามเพ็ง"}, {"id": "627", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "พรสุดา", "lname": "โพธิ์อินทร์"}, {"id": "628", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "อรพรรณ", "lname": "บัวนาค"}, {"id": "629", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "พนิดา", "lname": "ย่างกุ้ง"}, {"id": "630", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "ธวัลรัตน์", "lname": "ชาภูวงค์"}, {"id": "631", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "พจนิน", "lname": "จันทร์ขันตี"}, {"id": "632", "dept": "งานอุบัติเหตุฉุกเฉิน ( ER )", "prefix": "นางสาว", "fname": "ปนิตา", "lname": "จันผาย"}, {"id": "635", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "ฟิสิกส์พงษ์", "lname": "บึงมุม"}, {"id": "636", "dept": "ทันตกรรม", "prefix": "นาง", "fname": "ไพลิน", "lname": "บึงกาญจนสวัสดิ์"}, {"id": "637", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "ณัฐรวี", "lname": "ขุมจันทร์"}, {"id": "638", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "มานิตา", "lname": "บุบผาวาสน์"}, {"id": "639", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "ณฐเสฏฐ์", "lname": "ตงกิจเจริญ"}, {"id": "640", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "ชัยวุฒิ", "lname": "คำปิงใจ"}, {"id": "641", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "พลประชา", "lname": "กุลทิพย์"}, {"id": "642", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "ภรณ์ทิพย์", "lname": "ตันแสงทอง"}, {"id": "643", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "อรอนงค์", "lname": "เนตรสุวรรณ์"}, {"id": "644", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "กชกร", "lname": "ตันตินาม"}, {"id": "645", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "นภัส", "lname": "อจละนันท์"}, {"id": "646", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "ปรัชญาพร", "lname": "สียา"}, {"id": "647", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "สุวนันท์", "lname": "ไชยวุฒิ"}, {"id": "648", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "คมกฤษณ์", "lname": "บุญสอน"}, {"id": "649", "dept": "ทันตกรรม", "prefix": "นาง", "fname": "วิยะดา", "lname": "จันทรประทักษ์"}, {"id": "650", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "จิดาภา", "lname": "กนกรัตนนุกูล"}, {"id": "651", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "ฐิติกร", "lname": "กล้วยเครือ"}, {"id": "652", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "ปราณชีวา", "lname": "ศรีสุชาติ"}, {"id": "653", "dept": "ทันตกรรม", "prefix": "นาย", "fname": "วชิรวิทย์", "lname": "ชัยวงค์"}, {"id": "654", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "วัชรพร", "lname": "แก้วเชิงค้า"}, {"id": "655", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "สายฝน", "lname": "บุญหล่อ"}, {"id": "656", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "ธิติยา", "lname": "สูนสุข"}, {"id": "657", "dept": "ทันตกรรม", "prefix": "นางสาว", "fname": "จันจิรา", "lname": "อินทะนันท์"}, {"id": "660", "dept": "แพทย์แผนไทย", "prefix": "นางสาว", "fname": "ชุลีกร", "lname": "จุลโยธา"}, {"id": "661", "dept": "แพทย์แผนไทย", "prefix": "นาย", "fname": "มนต์รัก", "lname": "หาบุญมา"}, {"id": "662", "dept": "แพทย์แผนไทย", "prefix": "นางสาว", "fname": "จิรัญญา", "lname": "พรมเชียง"}, {"id": "663", "dept": "แพทย์แผนไทย", "prefix": "นาย", "fname": "ธิติรัช", "lname": "เลิศอุฬาร"}, {"id": "664", "dept": "แพทย์แผนไทย", "prefix": "นางสาว", "fname": "เจนจิรา", "lname": "ประเสริฐนิกรกุล"}, {"id": "665", "dept": "แพทย์แผนไทย", "prefix": "นางสาว", "fname": "เนติยา", "lname": "วงค์คำจันทร์"}, {"id": "668", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นาง", "fname": "นางวัลลภา", "lname": "ช่างเจรจา"}, {"id": "669", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "กุลญาดา", "lname": "โคตรวรมมา"}, {"id": "670", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "ไอลดา", "lname": "สีดาบัว"}, {"id": "671", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "กมลชนก", "lname": "ไสยวิจีณ"}, {"id": "672", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "จิราวรรณ", "lname": "วิทเวช"}, {"id": "673", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "สุพัตรา", "lname": "ชูพรมวงค์"}, {"id": "674", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "อโณทัย", "lname": "เดโชรัมย์"}, {"id": "675", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "วริศรา", "lname": "วงษ์หาบุตร"}, {"id": "676", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "วราภรณ์", "lname": "ทองทา"}, {"id": "677", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "เบญจมาศ", "lname": "พันจำปา"}, {"id": "678", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "สุวิณี", "lname": "แก้วเทพ"}, {"id": "679", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "ปิยมาส", "lname": "ย่างกุ้ง"}, {"id": "680", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "วรรณยุพา", "lname": "ชัยสุข"}, {"id": "681", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "สุดารัตน์", "lname": "เหลาทอง"}, {"id": "682", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "คณิตา", "lname": "เคนคำพัน"}, {"id": "683", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "ขวัญภิรมย์", "lname": "ศรีจันทร์"}, {"id": "684", "dept": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "prefix": "นางสาว", "fname": "นฤมล", "lname": "ชุมพร"}, {"id": "687", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นาง", "fname": "แจ่มนภา", "lname": "อารีรักษ์"}, {"id": "688", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "วราภรณ์", "lname": "สุวรรณกาล"}, {"id": "689", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "จุฑาทิพย์", "lname": "ภูริบัญชา"}, {"id": "690", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "รัตนา", "lname": "อินทวงค์"}, {"id": "691", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "พนิดา", "lname": "คำพิพากษ์"}, {"id": "692", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "จินตนา", "lname": "อารีรมย์"}, {"id": "693", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "อรัญญา", "lname": "แก้วมุงคุณ"}, {"id": "694", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "นภัสสร", "lname": "อินธิศักดิ์"}, {"id": "695", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "ศืริญญา", "lname": "หล้าโน"}, {"id": "696", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "ชญานี", "lname": "คะสุดใจ"}, {"id": "697", "dept": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "prefix": "นางสาว", "fname": "พรทิพย์", "lname": "แก้วเนตร"}, {"id": "700", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นาง", "fname": "สุวิมล", "lname": "บึงกาญจนา"}, {"id": "701", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "ละอองดาว", "lname": "ด้วงพันลำ"}, {"id": "702", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "อภิญาดา", "lname": "กองนาแซง"}, {"id": "703", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "พรรัมภา", "lname": "เสาะก่าน"}, {"id": "704", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "ธนาภรณ์", "lname": "หงษาคำ"}, {"id": "705", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "อุไร", "lname": "โคตรเครื่อง"}, {"id": "706", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "ฟารีดา", "lname": "พูดหวาน"}, {"id": "707", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "วิจิตรา", "lname": "วะโลหะ"}, {"id": "708", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "พรพรรณ", "lname": "นามฮาด"}, {"id": "709", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "ทิวาพร", "lname": "ภานุรักษ์"}, {"id": "710", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "ญาณิสร", "lname": "จิตรชัยศรี"}, {"id": "711", "dept": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "prefix": "นางสาว", "fname": "มะลิษา", "lname": "หอมพรมมา"}, {"id": "714", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "นภาพรรณ", "lname": "จันทคัต"}, {"id": "715", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "เพชรา", "lname": "ชุมพร"}, {"id": "716", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นาง", "fname": "อรัญญา", "lname": "ลำพุทธา"}, {"id": "717", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "อัจฉรา", "lname": "การดี"}, {"id": "718", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "ดารัตน์", "lname": "เชื้อนวน"}, {"id": "719", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "ทิวารี", "lname": "ดีวาสนา"}, {"id": "720", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "รัตนา", "lname": "สานุจิตร"}, {"id": "721", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "ภัทรวรรณ", "lname": "เจริญกิตติวรากูล"}, {"id": "722", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "อารียา", "lname": "ลามคำ"}, {"id": "723", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "นุชจรีย์", "lname": "คำมุงคุณ"}, {"id": "724", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "ราตรี", "lname": "ไชยศลธ์"}, {"id": "725", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "สุดารัตน์", "lname": "สุขชิต"}, {"id": "726", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "มะลิษา", "lname": "หอมพรมมา"}, {"id": "727", "dept": "หอผู้ป่วยหลังคลอด", "prefix": "นางสาว", "fname": "อาจารียา", "lname": "อภิรักษ์"}, {"id": "730", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นาง", "fname": "สุพรรณี", "lname": "รันนันท์"}, {"id": "731", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นาง", "fname": "กนกวรรณ", "lname": "ทองนิน"}, {"id": "732", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "ทัศนียา", "lname": "ดาจง"}, {"id": "733", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "พัชรี", "lname": "บุญละคร"}, {"id": "734", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "สุธาวี", "lname": "วงษาบุตร"}, {"id": "735", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "มินตรา", "lname": "วะชุม"}, {"id": "736", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "ยุวธิดา", "lname": "พลอยหิน"}, {"id": "737", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "รัตนา", "lname": "แสงสุกวาว"}, {"id": "738", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "ปริญดา", "lname": "บึงราษฎร์"}, {"id": "739", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "อนงนาฎ", "lname": "เทียบคำ"}, {"id": "740", "dept": "ตึกศัลยกรรม VIP 6", "prefix": "นางสาว", "fname": "นฤมล", "lname": "ชุมพร"}, {"id": "742", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ฉวีวรรณ", "lname": "มินเทน"}, {"id": "743", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "พรรณทิพา", "lname": "แก้วคร"}, {"id": "744", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ปภัสรา", "lname": "วาปีกะ"}, {"id": "745", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ปวีณา", "lname": "พิมพ์เพ็ง"}, {"id": "746", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "นันณภัชสรณ์", "lname": "เบ้าคำ"}, {"id": "747", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "อภัชฎา", "lname": "คำสว่าง"}, {"id": "748", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "วชิราภรณ์", "lname": "อัคลา"}, {"id": "749", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ปิยะนุช", "lname": "ไชยเพ็ชร"}, {"id": "750", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "สุชานันท์", "lname": "พิมพ์สิงห์"}, {"id": "751", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "จรรญา", "lname": "ติดมา"}, {"id": "752", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "วาสนา", "lname": "วีระบุตร"}, {"id": "753", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "กาญจนา", "lname": "นาคศรี"}, {"id": "754", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "กุลธิดา", "lname": "สายพรม"}, {"id": "755", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ณริศรา", "lname": "จันทร์สุข"}, {"id": "756", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ธัญวรัตน์", "lname": "อองตัน"}, {"id": "757", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ยุวธิดา", "lname": "พลอยหิน"}, {"id": "758", "dept": "ตึกศัลยกรรมหญิง", "prefix": "นางสาว", "fname": "ศิริวรรณ", "lname": "อุคำ"}, {"id": "761", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "สุภาพร", "lname": "คำสว่าง"}, {"id": "762", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "จารุณี", "lname": "ชัยวัน"}, {"id": "763", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "ทัศนีย์", "lname": "สิงห์สุพรรณ"}, {"id": "764", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "วาทินี", "lname": "กรมแสง"}, {"id": "765", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "มิตราภรณ์", "lname": "ไกรรัตน์"}, {"id": "766", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "ณัฐยา", "lname": "โพธิบัญดิษ"}, {"id": "767", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "รุ่งฤดี", "lname": "ศรีสุภา"}, {"id": "768", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "จุฑากาญจน์", "lname": "บุญทอง"}, {"id": "769", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "ปิยธิดา", "lname": "ภูทัต"}, {"id": "770", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "ปานตะวัน", "lname": "สีหราช"}, {"id": "771", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "อนุชศรา", "lname": "ศรีสุข"}, {"id": "772", "dept": "ตึกศัลยกรรมชาย", "prefix": "นาย", "fname": "ณัฐวุฒิ", "lname": "กายากุล"}, {"id": "773", "dept": "ตึกศัลยกรรมชาย", "prefix": "นาย", "fname": "ณัฐนันท์", "lname": "สุพร"}, {"id": "774", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "เกษราพร", "lname": "ชัยชิต"}, {"id": "775", "dept": "ตึกศัลยกรรมชาย", "prefix": "นาย", "fname": "ธนภัทร", "lname": "ดำทิพย์"}, {"id": "776", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "ปาริชาติ", "lname": "ราชคต"}, {"id": "777", "dept": "ตึกศัลยกรรมชาย", "prefix": "นางสาว", "fname": "ญาณิศา", "lname": "โพธิ์สุริยะ"}, {"id": "780", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นาง", "fname": "วงธิพา", "lname": "ศรีทุมมา"}, {"id": "781", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "ศศิธร", "lname": "วันตา"}, {"id": "782", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "จุฑามาศ", "lname": "เชื้อเวียง"}, {"id": "783", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "สโรชา", "lname": "คำมูล"}, {"id": "784", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "จิรัตน์ติกร", "lname": "นางาม"}, {"id": "785", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "จินดารัตน์", "lname": "ติดมา"}, {"id": "786", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "อัมภาพร", "lname": "โคตรพรม"}, {"id": "787", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "ธิดารัตน์", "lname": "วงษ์ตาหล้า"}, {"id": "788", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "พีรดา", "lname": "ติดมา"}, {"id": "791", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "อุทุมพร", "lname": "โพธิ์สิงห์"}, {"id": "792", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ศศิวิมล", "lname": "พินทา"}, {"id": "793", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "วรรณภา", "lname": "วันตา"}, {"id": "794", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "กิ่งกาญจน์", "lname": "อุ่นใจ"}, {"id": "795", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "จุฑารัตน์", "lname": "เทียนขาว"}, {"id": "796", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ชฎาพร", "lname": "ผาด่านแก้ว"}, {"id": "797", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "นาราภัทร", "lname": "มูลเพชร"}, {"id": "798", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "กรนิกา", "lname": "ตั้งใจ"}, {"id": "799", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "พรลภัส", "lname": "มาตา"}, {"id": "800", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "เยาวเรศ", "lname": "วินโรจน์"}, {"id": "801", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "พิศมัย", "lname": "ฤทธิศร"}, {"id": "802", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ธิดารัตน์", "lname": "พิมพะวะ"}, {"id": "803", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ยลธิตา", "lname": "แสนโคตร"}, {"id": "804", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ศิริลักษณ์", "lname": "มะลิทอง"}, {"id": "805", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ธิดารัตน์", "lname": "วงษ์ตาหล้า"}, {"id": "806", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ชลดา", "lname": "อุตรมาตย์"}, {"id": "807", "dept": "ตึกหลอดเลือดสมอง", "prefix": "นางสาว", "fname": "พัชรพร", "lname": "บุแก้ว"}, {"id": "808", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "ยุพาพร", "lname": "แพงน้อย"}, {"id": "809", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "วิยะดา", "lname": "ยางป้อม"}, {"id": "810", "dept": "ตึกอายุรกรรมหญิง", "prefix": "นางสาว", "fname": "เจนจิรา", "lname": "นามวงศ์"}, {"id": "812", "dept": "ตึกอายุรกรรมชาย", "prefix": "นาง", "fname": "แสงวิลัย", "lname": "พรรณาขา"}, {"id": "813", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "เพชรมณี", "lname": "เฉยฉิว"}, {"id": "814", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "สุภาลักษณ์", "lname": "ถานโอกาส"}, {"id": "815", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "กมลวรรณ", "lname": "ปัญญาพ่อ"}, {"id": "816", "dept": "ตึกอายุรกรรมชาย", "prefix": "นาย", "fname": "ชานนท์", "lname": "ไชยแสง"}, {"id": "817", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "เยาวเรศ", "lname": "พรมกสิกร"}, {"id": "818", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "จุฑามาศ", "lname": "โพธะมาศ"}, {"id": "819", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "อรวรรณ", "lname": "คำสว่าง"}, {"id": "820", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "นภาวรรณ", "lname": "แสนหมื่น"}, {"id": "821", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "หนึ่งฤทัย", "lname": "ไวจำปา"}, {"id": "822", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ณัฐการต์", "lname": "บุตรเวทย์"}, {"id": "823", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "นันท์นภัส", "lname": "ผดุงจันทร์"}, {"id": "824", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ธิดารัตน์", "lname": "อรรควงษ์"}, {"id": "825", "dept": "ตึกอายุรกรรมชาย", "prefix": "นาย", "fname": "จักรพันธ์", "lname": "จันผาย"}, {"id": "826", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "สุภาวรรณ", "lname": "ขันอาษา"}, {"id": "827", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "อุไรวรรณ", "lname": "พิมพ์สุวรรณ์"}, {"id": "828", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "สรินญา", "lname": "ทรงสังขาร"}, {"id": "829", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "วิลาวรรณ", "lname": "ชินคำ"}, {"id": "830", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ธิดารัตน์", "lname": "เจริญรัตน์"}, {"id": "831", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "กรณิศ", "lname": "วังสะพันธ์"}, {"id": "832", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "สุดาวัล", "lname": "จันทร์ชา"}, {"id": "833", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "สรินญา", "lname": "ทรงสังขาร"}, {"id": "834", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ธิดารัตน์", "lname": "เจริญรัตน์"}, {"id": "835", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ปาริชาติ", "lname": "ราชคต"}, {"id": "836", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ญาณิศา", "lname": "โพธิ์สุริยะ"}, {"id": "837", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ปานตะวัน", "lname": "สีหราช"}, {"id": "838", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "เกษราพร", "lname": "ชัยชิต"}, {"id": "839", "dept": "ตึกอายุรกรรมชาย", "prefix": "นางสาว", "fname": "ชมพูนุท", "lname": "รูปน้อย"}, {"id": "842", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นาง", "fname": "ยุพิน", "lname": "นาคโคตร"}, {"id": "843", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "อลิษา", "lname": "เคนอุทุม"}, {"id": "844", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นาง", "fname": "พฤกษา", "lname": "ชาวยามกา"}, {"id": "845", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ทิพากร", "lname": "ภูเต้านิล"}, {"id": "846", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นาย", "fname": "วีรพงศ์", "lname": "บุราณเดช"}, {"id": "847", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ประทุมวรรณ", "lname": "พันธุ์นิยม"}, {"id": "848", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "วิริยาภรณ์", "lname": "ศรีโสภา"}, {"id": "849", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "สุภาพร", "lname": "พรมเขต"}, {"id": "850", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "วรลักษณ์", "lname": "สัพโส"}, {"id": "851", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ปนัดดา", "lname": "คำไล่"}, {"id": "852", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "นฤมล", "lname": "ศรีงาม"}, {"id": "853", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "สุภิรัตน์", "lname": "ธรรมดาชัย"}, {"id": "854", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "รุจิเรศ", "lname": "อุดมเลิศ"}, {"id": "855", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ธนาภรณ์", "lname": "แก้วนาง"}, {"id": "856", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "เกวลิน", "lname": "กุดวงค์แก้ว"}, {"id": "857", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "พรนิภา", "lname": "เนื่องแก้ว"}, {"id": "858", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ธนภัค", "lname": "ภูฉายา"}, {"id": "859", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "วรรณพร", "lname": "รอดบุญมา"}, {"id": "860", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "เกตุธิดา", "lname": "หัสประกอบ"}, {"id": "861", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "นภาพร", "lname": "หวังโสม"}, {"id": "862", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "จุฬาลักษณ์", "lname": "สมบูรณ์"}, {"id": "863", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "จุฑารัตน์", "lname": "วินากร"}, {"id": "864", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "พรเพชร", "lname": "อินเมืองแก้ว"}, {"id": "865", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ปวีณา", "lname": "ติดมา"}, {"id": "866", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "พรเพชร", "lname": "อินเมืองแก้ว"}, {"id": "867", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ปวีณา", "lname": "ติดมา"}, {"id": "868", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ธนาภรณ์", "lname": "แก้วนาง"}, {"id": "869", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "ชญานี", "lname": "สีวิบุญทร"}, {"id": "870", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "เกตุธิดา", "lname": "หัสประกอบ"}, {"id": "871", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "นภาพร", "lname": "กุพันลำ"}, {"id": "872", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "จุฑารัตน์", "lname": "วินากร"}, {"id": "873", "dept": "ตึกศัลยกรรมกระดูก", "prefix": "นางสาว", "fname": "เบญจมาศ", "lname": "ภูบุรมณ์"}, {"id": "876", "dept": "รักษ์จิต ช/ญ", "prefix": "นาง", "fname": "สายวสันต์", "lname": "สวยสมเรียม"}, {"id": "877", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "สมคะเน", "lname": "โพธิ์บาย"}, {"id": "878", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "เสาวณีย์", "lname": "สีพรม"}, {"id": "879", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "ภาลิตา", "lname": "วิลาชัย"}, {"id": "880", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "อิษยา", "lname": "ชัยมงคล"}, {"id": "881", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "นภัสสร", "lname": "โยธนามิ"}, {"id": "882", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "ชลธิชา", "lname": "สุภาปู"}, {"id": "883", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "ธีริศรา", "lname": "แสงเพชร"}, {"id": "884", "dept": "รักษ์จิต ช/ญ", "prefix": "นางสาว", "fname": "จิรวดี", "lname": "ศรีชุม"}, {"id": "885", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "ธวัชชัย", "lname": "ผาไชย"}, {"id": "886", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "ธนชัย", "lname": "มนทาน้อย"}, {"id": "887", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "ธนภัทร", "lname": "ดำทิพย์"}, {"id": "888", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "เกษมสันต์", "lname": "สุระตะนัย"}, {"id": "889", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "พิชญภัค", "lname": "จารย์โพธิ์"}, {"id": "890", "dept": "รักษ์จิต ช/ญ", "prefix": "นาย", "fname": "ธรรมรัตน์", "lname": "โพธิ์พุฒ"}, {"id": "893", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นาง", "fname": "อัญชลี", "lname": "มาลาศรี"}, {"id": "894", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นาง", "fname": "กาญจนา", "lname": "กาญประกอบ"}, {"id": "895", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "หทัยกาญจน์", "lname": "โชติอนุพันธุ์"}, {"id": "896", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "ธัญชนก", "lname": "โพธิ์อินทร์"}, {"id": "897", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "ศศิวิมล", "lname": "เจริญตา"}, {"id": "898", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นาง", "fname": "อัจฉราวลัย", "lname": "จำปาทัศน์"}, {"id": "899", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "สุวิมล", "lname": "มะลิทอง"}, {"id": "900", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "เสาวลักษณ์", "lname": "จรถวิล"}, {"id": "901", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "วิไลวรรณ", "lname": "หนองนา"}, {"id": "902", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "สุพัตรา", "lname": "สุราช"}, {"id": "903", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "นพรดา", "lname": "เหล่าราช"}, {"id": "904", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "อภิชญา", "lname": "นาคโคตร"}, {"id": "905", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "นาตยา", "lname": "แดนขนบ"}, {"id": "906", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "นริศรา", "lname": "สิทธิศักดิ์"}, {"id": "907", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "พรพนิต", "lname": "โชติเมืองปัก"}, {"id": "908", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "จุฑาพร", "lname": "หลานวงค์"}, {"id": "909", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "ภัทริน", "lname": "จำปาลี"}, {"id": "910", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "ผกายกาญจน์", "lname": "ชาวสวน"}, {"id": "911", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "พลอยไพลิน", "lname": "วงค์ผาบุตร"}, {"id": "912", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "เกตน์นิภา", "lname": "ริกำแง"}, {"id": "913", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "ศศิโสมย์", "lname": "ศรีมีชัย"}, {"id": "914", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "สุนีรัตน์", "lname": "ติดมา"}, {"id": "915", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "ปวีณา", "lname": "สิงคำป้อง"}, {"id": "916", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นาย", "fname": "ชัยชาญ", "lname": "โสดา"}, {"id": "917", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "กัญญากร", "lname": "โพธิบึงกาฬ"}, {"id": "918", "dept": "ตึกผู้ป่วยหนัก", "prefix": "นางสาว", "fname": "พัชรินทร์", "lname": "ผาสุก"}, {"id": "921", "dept": "คลีนิคเวชกรรมสังคม", "prefix": "นางสาว", "fname": "ปวีณา", "lname": "ขุนลาด"}, {"id": "922", "dept": "คลีนิคเวชกรรมสังคม", "prefix": "นาง", "fname": "ปวีณา", "lname": "พลวงศ์ษา"}, {"id": "923", "dept": "คลีนิคเวชกรรมสังคม", "prefix": "นางสาว", "fname": "กรรณิกา", "lname": "โพธิสว่าง"}, {"id": "924", "dept": "คลีนิคเวชกรรมสังคม", "prefix": "นางสาว", "fname": "ธนัชญา", "lname": "ท่าราษฎร์"}, {"id": "927", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นาง", "fname": "นิภาพรรณ", "lname": "กาญจนกัณโห"}, {"id": "928", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นาง", "fname": "เจนจิรา", "lname": "ประไพวงษ์"}, {"id": "929", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นางสาว", "fname": "วิไล", "lname": "ศรีชาดี"}, {"id": "930", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นางสาว", "fname": "วรรณิศา", "lname": "ไพคำนาม"}, {"id": "931", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นาย", "fname": "กฤษฎา", "lname": "จอดนอก"}, {"id": "932", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นาย", "fname": "ศัตรูพ่าย", "lname": "คชราช"}, {"id": "933", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นางสาว", "fname": "ดลฤดี", "lname": "หวังหมู่กลาง"}, {"id": "934", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นางสาว", "fname": "ชลดา", "lname": "ไชยงาม"}, {"id": "935", "dept": "ศูนย์สุขภาพชุมชนเมือง", "prefix": "นางสาว", "fname": "ธิชา", "lname": "นันทราช"}, {"id": "938", "dept": "งานการพยาบาลชุมชน", "prefix": "นาง", "fname": "อภิษฎา", "lname": "ศรีสงคราม"}, {"id": "939", "dept": "งานการพยาบาลชุมชน", "prefix": "นาง", "fname": "พนิดา", "lname": "เนื่องชมภู"}, {"id": "940", "dept": "งานการพยาบาลชุมชน", "prefix": "นางสาว", "fname": "สุนันทา", "lname": "โคตรอาษา"}, {"id": "941", "dept": "งานการพยาบาลชุมชน", "prefix": "นาง", "fname": "รัชนีกร", "lname": "บ่อทอง"}, {"id": "942", "dept": "งานการพยาบาลชุมชน", "prefix": "นางสาว", "fname": "วิไลวรรณ", "lname": "ราศี"}, {"id": "945", "dept": "อาชีวอนามัย", "prefix": "นาง", "fname": "บุญนรี", "lname": "บุญประเสริฐ"}, {"id": "946", "dept": "อาชีวอนามัย", "prefix": "นาย", "fname": "ฑิฎฐิธนา", "lname": "บุญชู"}, {"id": "947", "dept": "อาชีวอนามัย", "prefix": "นางสาว", "fname": "ปิยนุช", "lname": "กาญจนเศรษฐ"}, {"id": "948", "dept": "อาชีวอนามัย", "prefix": "นางสาว", "fname": "ฐิติรัตน์", "lname": "พิมพ์รัตน์"}, {"id": "949", "dept": "อาชีวอนามัย", "prefix": "นางสาว", "fname": "เพ็ญพิชา", "lname": "ศรีโสดา"}, {"id": "950", "dept": "อาชีวอนามัย", "prefix": "นาย", "fname": "บารเมษวร์", "lname": "คนมั่น"}, {"id": "951", "dept": "อาชีวอนามัย", "prefix": "นางสาว", "fname": "อธิษฐาน", "lname": "แดดขุนทศ"}, {"id": "952", "dept": "อาชีวอนามัย", "prefix": "นาย", "fname": "บารเมศวร์", "lname": "คนมั่น"}, {"id": "954", "dept": "สุขศึกษา", "prefix": "นางสาว", "fname": "สุกัญญา", "lname": "จันทร์อ้วน"}, {"id": "955", "dept": "สุขศึกษา", "prefix": "นางสาว", "fname": "ภาวิณี", "lname": "อุ้ยวงค์"}];
+const COSTCENTERS = [{"code": "A0101", "name": "ธุรการ"}, {"code": "A0201", "name": "พัสดุ"}, {"code": "A0501", "name": "การเงินและบัญชี"}, {"code": "A0701", "name": "งานการเจ้าหน้าที่"}, {"code": "A0801", "name": "ยานพาหนะ"}, {"code": "A1001", "name": "ซ่อมบำรุง"}, {"code": "A1301", "name": "เทคโนโลยีสารสนเทศ"}, {"code": "A1401", "name": "เครื่องมือแพทย์"}, {"code": "A1601", "name": "ประชาสัมพันธ์"}, {"code": "A1801", "name": "โสตและสื่อ"}, {"code": "A2001", "name": "ห้องสมุด"}, {"code": "A2301", "name": "ภาคสนาม"}, {"code": "A2701", "name": "ศูนย์คุณภาพ"}, {"code": "A2901", "name": "งานIC"}, {"code": "A3401", "name": "เวชระเบียน"}, {"code": "A3501", "name": "ประกันสุขภาพ"}, {"code": "A4301", "name": "จัดการขยะ"}, {"code": "A4401", "name": "ซักฟอก"}, {"code": "A4601", "name": "ตัดเย็บ"}, {"code": "A4701", "name": "จ่ายกลาง"}, {"code": "A4901", "name": "ศูนย์เปล"}, {"code": "A5301", "name": "คลังเวชภัณฑ์"}, {"code": "A6401", "name": "กลุ่มการพยาบาล"}, {"code": "E0403", "name": "ช่วยราชการ/แม่บ้าน"}, {"code": "C0101", "name": "เทคนิคการแพทย์ (LAB)"}, {"code": "C0301", "name": "รังสี (X-RAY)"}, {"code": "C0701-1", "name": "เภสัชกรรมชุมชน (บน)"}, {"code": "C0701-2", "name": "เภสัชกรรมชุมชน (ล่าง)"}, {"code": "C0901", "name": "กายภาพบำบัด"}, {"code": "C1101", "name": "ห้องผ่าตัด"}, {"code": "C1201", "name": "งานวิสัญญี"}, {"code": "C0201", "name": "ห้องคลอด"}, {"code": "C1401", "name": "โภชนาการ"}, {"code": "C1501", "name": "องค์กรแพทย์"}, {"code": "C1601", "name": "ไตเทียม"}, {"code": "C5001", "name": "ผู้ป่วยนอก (OPD)"}, {"code": "C5101", "name": "ANC"}, {"code": "C5102", "name": "สูติ-นรีเวชกรรม"}, {"code": "C5103", "name": "คลีนิกอายุรกรรม"}, {"code": "C5104", "name": "สุขภาพจิต"}, {"code": "C5105", "name": "งานให้คำปรึกษา"}, {"code": "C5106", "name": "คลีนิคโรคตา"}, {"code": "C6001", "name": "อุบัติเหตุและฉุกเฉิน (ER)"}, {"code": "C6001", "name": "ศูนย์สั่งการ"}, {"code": "C6101", "name": "ทันตสาธารณสุข"}, {"code": "C6201", "name": "แพทย์แผนไทย"}, {"code": "D2001", "name": "ตึกผู้ป่วยพิเศษ (VIP)"}, {"code": "D4001", "name": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)"}, {"code": "D4002", "name": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)"}, {"code": "D4002", "name": "ตึกผู้ป่วยหลังคลอด"}, {"code": "D4003", "name": "ตึกศัลยกรรมหญิง"}, {"code": "D4004", "name": "ตึกศัลยกรรมชาย"}, {"code": "D4004", "name": "ตึกอายุรกรรมหญิง"}, {"code": "D4005", "name": "ตึกอายุรกรรมชาย"}, {"code": "D4006", "name": "ตึกศัลยกรรมกระดูก"}, {"code": "D4007", "name": "ตึกตา/จักษุ"}, {"code": "D5001", "name": "ตึกผู้ป่วยหนัก"}, {"code": "E0401", "name": "เวชกรรมสังคม"}, {"code": "E0402", "name": "ศูนย์สุขภาพชุมชนเมือง"}, {"code": "E0901", "name": "อาชีวอนามัย"}, {"code": "E1801", "name": "สุขศึกษา"}];
+const DEPT_TOTALS = [{"name": "กลุ่มงานบริหารทั่วไป", "total": 10}, {"name": "งานประชาสัมพันธ์", "total": 2}, {"name": "การเงิน", "total": 12}, {"name": "บัญชี", "total": 7}, {"name": "พัสดุ", "total": 13}, {"name": "งานทรัพยากรบุคคล", "total": 7}, {"name": "งานยานพาหนะ", "total": 11}, {"name": "งานโครงสร้างฯ", "total": 15}, {"name": "งานบ่อบำบัด", "total": 1}, {"name": "งานภาคสนาม", "total": 5}, {"name": "งานกำจัดขยะ", "total": 5}, {"name": "งานซักฟอก", "total": 13}, {"name": "งานตัดเย็บ", "total": 2}, {"name": "งานเครื่องมือแพทย์", "total": 6}, {"name": "กลุ่มงานแม่บ้านบริหาร", "total": 27}, {"name": "จ่ายกลาง", "total": 13}, {"name": "กลุ่มงานสารสนเทศทางการแพทย์", "total": 6}, {"name": "เวชระเบียน", "total": 19}, {"name": "กลุ่มงานประกันสุขภาพ", "total": 15}, {"name": "กลุ่มงานยุทธศาสตร์และแผนงานโครงการ", "total": 2}, {"name": "กลุ่มงานพัฒนาทรัพยากรบุคคล", "total": 3}, {"name": "งานโสตทัศนศึกษา", "total": 3}, {"name": "ศูนย์คุณภาพ", "total": 3}, {"name": "โภชนศาสตร์", "total": 19}, {"name": "กลุ่มการพยาบาล", "total": 4}, {"name": "เทคนิคการแพทย์(LAB)", "total": 28}, {"name": "งานรังสี ( X-ray )", "total": 10}, {"name": "เภสัชกรรมชุมชน (บน)", "total": 11}, {"name": "เภสัชกรรม(บน)", "total": 4}, {"name": "เภสัชกรรมชุมชน (บน,ล่าง)", "total": 19}, {"name": "กายภาพบำบัด", "total": 9}, {"name": "ห้องผ่าตัด", "total": 47}, {"name": "งานวิสัญญี", "total": 21}, {"name": "ห้องคลอด", "total": 15}, {"name": "โภชนาการ", "total": 4}, {"name": "องค์กรแพทย์", "total": 45}, {"name": "ไตเทียม", "total": 17}, {"name": "ศูนย์รับแจ้งเหตุและสั่งการ(EMS)", "total": 5}, {"name": "คลีนิคศัลยกรรมตรวจโรคทั่วไป (OPDทั่วไป)", "total": 18}, {"name": "OPDสูติ-นรีเวชกรรม", "total": 7}, {"name": "คลีนิคอายุรกรรม", "total": 12}, {"name": "OPDสุขภาพจิตและยาเสพติด", "total": 10}, {"name": "งานให้คำปรึกษา(คลีนิคนภา)", "total": 4}, {"name": "ตึกตา/จักษุ", "total": 10}, {"name": "คลินิก ARI/ฉีดยาทำแผล", "total": 4}, {"name": "OPDศัลยกรรมระบบทางเดินปัสสาวะ", "total": 5}, {"name": "คลีนิคตรวจโรคทั่วไป (OPDทั่วไป)", "total": 7}, {"name": "งานอุบัติเหตุฉุกเฉิน ( ER )", "total": 32}, {"name": "ทันตกรรม", "total": 23}, {"name": "แพทย์แผนไทย", "total": 6}, {"name": "ตึกผู้ป่วยพิเศษ (VIPชั้น8,9)", "total": 17}, {"name": "ตึกผู้ป่วยเด็กเล็ก (กุมารเวช1)", "total": 11}, {"name": "ตึกผู้ป่วยเด็กโต (กุมารเวช2)", "total": 12}, {"name": "หอผู้ป่วยหลังคลอด", "total": 14}, {"name": "ตึกศัลยกรรม VIP 6", "total": 11}, {"name": "ตึกศัลยกรรมหญิง", "total": 17}, {"name": "ตึกศัลยกรรมชาย", "total": 17}, {"name": "ตึกหลอดเลือดสมอง", "total": 10}, {"name": "ตึกอายุรกรรมหญิง", "total": 19}, {"name": "ตึกอายุรกรรมชาย", "total": 28}, {"name": "ตึกศัลยกรรมกระดูก", "total": 32}, {"name": "รักษ์จิต ช/ญ", "total": 15}, {"name": "ตึกผู้ป่วยหนัก", "total": 26}, {"name": "คลีนิคเวชกรรมสังคม", "total": 4}, {"name": "ศูนย์สุขภาพชุมชนเมือง", "total": 9}, {"name": "งานการพยาบาลชุมชน", "total": 5}, {"name": "อาชีวอนามัย", "total": 8}, {"name": "สุขศึกษา", "total": 2}, {"name": "รวมทั้งหมด", "total": 853}];
+
+/* ======================= ICONS ======================= */
+const ICONS = {
+  bolt:'<svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1.4-3.6 4.4-5.4 7.5-5.4s6.1 1.8 7.5 5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  building:'<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.8"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+
+/* ======================= STATE ======================= */
+let view = 'home';
+let remoteData = { personalIds: [], deptCodes: [], loaded: false, error:false };
+
+let personalForm = {
+  step: 1, id:'', person:null, hasEV:null, vehicles:[], bringToWork:null, wantCharging:null, suggestion:''
+};
+let deptForm = {
+  step: 1, code:'', center:null, submitterName:'', position:'', phone:'',
+  hasEV:null, vehicles:[], bringToWork:null, wantCharging:null, suggestion:''
+};
+let summaryPwOk = false;
+let pwInput = '';
+
+/* ======================= HELPERS ======================= */
+function vId(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+
+function findPerson(id){
+  const raw = String(id).trim();
+  let p = PEOPLE.find(p => p.id === raw);
+  if(!p && /^\d+$/.test(raw)){
+    const normalized = String(parseInt(raw,10));
+    p = PEOPLE.find(p => p.id === normalized);
+  }
+  return p;
+}
+function findCostCenter(code){
+  const c = String(code).trim().toUpperCase();
+  return COSTCENTERS.find(x => x.code.toUpperCase() === c);
+}
+
+async function loadRemoteData(){
+  if(!CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL.indexOf('REPLACE') !== -1 || CONFIG.SCRIPT_URL.indexOf('__') !== -1){
+    remoteData.error = 'noconfig';
+    render();
+    return;
+  }
+  try{
+    const res = await fetch(CONFIG.SCRIPT_URL, {method:'GET'});
+    const json = await res.json();
+    remoteData.personalIds = (json.personalIds||[]).map(String);
+    remoteData.deptCodes = (json.deptCodes||[]).map(String);
+    remoteData.loaded = true;
+    remoteData.error = false;
+  }catch(err){
+    remoteData.error = 'network';
+  }
+  render();
+}
+
+function vehiclesToText(list){
+  return list.map((v,i)=>`${i+1}) ${v.type} รุ่น ${v.model||'-'} สี ${v.color||'-'} ทะเบียน/ครุภัณฑ์ ${v.plate||'-'}`).join(' | ');
+}
+
+async function postForm(payload){
+  const res = await fetch(CONFIG.SCRIPT_URL, {
+    method:'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+function goHome(){
+  view='home';
+  personalForm = { step:1, id:'', person:null, hasEV:null, vehicles:[], bringToWork:null, wantCharging:null, suggestion:'' };
+  deptForm = { step:1, code:'', center:null, submitterName:'', position:'', phone:'', hasEV:null, vehicles:[], bringToWork:null, wantCharging:null, suggestion:'' };
+  render();
+}
+
+/* ======================= RENDER ROOT ======================= */
+function render(){
+  const app = document.getElementById('app');
+  if(view==='home') app.innerHTML = renderHome();
+  else if(view==='personal') app.innerHTML = renderPersonal();
+  else if(view==='department') app.innerHTML = renderDepartment();
+  else if(view==='dept-summary') app.innerHTML = renderDeptSummary();
+  else if(view==='personal-summary') app.innerHTML = renderPersonalSummary();
+  attachHandlers();
+  window.scrollTo(0,0);
+}
+
+/* ======================= HOME ======================= */
+function renderHome(){
+  return `
+  <div class="topbar">
+    <div class="bolt-badge">${ICONS.bolt}</div>
+    <div class="titles">
+      <div class="eyebrow">โรงพยาบาลบึงกาฬ</div>
+      <div class="name">แบบสำรวจยานพาหนะไฟฟ้า (EV)</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>แบบสำรวจยานพาหนะไฟฟ้า (EV) โรงพยาบาลบึงกาฬ</h1>
+    <p><b>วัตถุประสงค์</b><br>ตามที่ คณะทำงานขับเคลื่อนพลังงานสะอาดและยานยนต์ไฟฟ้า กระทรวงสาธารณสุข มีความประสงค์จะสำรวจจำนวนรถไฟฟ้า EV ของหน่วยงานต่าง ๆ ในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ทั้งส่วนกลางและส่วนภูมิภาค เพื่อเป็นแนวทางในการดำเนินงานกำหนดจุดติดตั้งระบบ EV และการวางระบบ Smart Charging ตามนโยบายรัฐมนตรีว่ากระทรวงสาธารณสุข เพื่อยกระดับบริการสู่ความเป็นเลิศ ด้านสุขภาพ ควบคู่สิ่งแวดล้อม ใช้พลังงานสะอาด ลดคาร์บอน มุ่งสู่ Net Zero นั้น
+    <br><br>ในการนี้ โรงพยาบาลบึงกาฬ จึงขอความร่วมมือบุคลากรฯ ทุกท่าน ตอบแบบสำรวจยานพาหนะไฟฟ้า (EV) รถส่วนตัวของเจ้าหน้าที่ และของหน่วยงาน ทั้งนี้ สามารถส่งข้อมูลได้จนถึงวันที่ ${CONFIG.DEADLINE}</p>
+    <div class="deadline-chip">${ICONS.bolt} ส่งข้อมูลได้ถึงวันที่ ${CONFIG.DEADLINE}</div>
+  </div>
+
+  ${remoteData.error==='noconfig' ? `
+  <div class="setup-note">
+    <b>ยังไม่เชื่อมต่อ Google Sheet</b>
+    ระบบยังใช้งานได้ปกติแต่ข้อมูลจะยังไม่ถูกบันทึกจริง — ผู้ดูแลระบบต้องนำ Web app URL จาก Google Apps Script มาใส่ในตัวแปร CONFIG.SCRIPT_URL ของไฟล์นี้ก่อนเผยแพร่ให้ใช้งานจริง
+  </div>` : ''}
+  ${remoteData.error==='network' ? `
+  <div class="setup-note">เชื่อมต่อฐานข้อมูลไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่อีกครั้ง</div>` : ''}
+
+  <div class="menu-card" onclick="openPersonal()">
+    <div class="menu-icon">${ICONS.user}</div>
+    <div class="menu-text">
+      <div class="t">ยานพาหนะไฟฟ้า (EV) ส่วนบุคคล</div>
+      <div class="d">สำหรับเจ้าหน้าที่กรอกข้อมูลรถ EV ส่วนตัว</div>
+    </div>
+    <div class="menu-arrow">${ICONS.arrow}</div>
+  </div>
+
+  <div class="menu-card" onclick="openDepartment()">
+    <div class="menu-icon">${ICONS.building}</div>
+    <div class="menu-text">
+      <div class="t">ยานพาหนะไฟฟ้า (EV) ของหน่วยงาน</div>
+      <div class="d">สำหรับตัวแทนหน่วยงานกรอกข้อมูลรถ EV ของหน่วยงาน</div>
+    </div>
+    <div class="menu-arrow">${ICONS.arrow}</div>
+  </div>
+
+  <div class="footer-links">
+    <div class="footer-link" onclick="view='dept-summary';render();">${ICONS.chart}สรุปผลหน่วยงาน</div>
+    <div class="footer-link" onclick="view='personal-summary';summaryPwOk=false;pwInput='';render();">${ICONS.lock}สรุปผลรายบุคคล</div>
+  </div>
+  `;
+}
+
+function openPersonal(){ view='personal'; personalForm.step=1; render(); }
+function openDepartment(){ view='department'; deptForm.step=1; render(); }
+
+/* ======================= BATTERY PROGRESS ======================= */
+function battery(step,total,label){
+  let cells='';
+  for(let i=1;i<=total;i++){ cells += `<div class="cell ${i<=step?'filled':''}"></div>`; }
+  return `<div class="battery"><div class="cells">${cells}</div><div class="tip"></div><div class="label">${label}</div></div>`;
+}
+
+function pageHead(title, onBack){
+  return `<div class="page-head"><div class="back-btn" onclick="${onBack}">${ICONS.back}</div><h2>${title}</h2></div>`;
+}
+
+/* ======================= CHOICE GROUP ======================= */
+function choiceGroup(name, options, selected, onSelect){
+  return `<div class="choice-group">` + options.map(opt=>`
+    <div class="choice ${selected===opt?'selected':''}" onclick="${onSelect}('${opt}')">
+      <div class="dot"></div><div class="txt">${opt}</div>
+    </div>`).join('') + `</div>`;
+}
+
+/* ======================= VEHICLE ROWS ======================= */
+function vehicleRows(list, typeOptions, addFn, removeFn, updateFn){
+  return list.map((v,i)=>`
+    <div class="vehicle-card">
+      <div class="vh-head"><div class="vh-num">คันที่ ${i+1}</div>
+        ${list.length>1?`<button class="vh-remove" onclick="${removeFn}(${i})">ลบ</button>`:''}
+      </div>
+      <div class="field">
+        <label style="font-size:11.5px;color:var(--muted);margin-bottom:7px;">ประเภทยานพาหนะ</label>
+        ${choiceGroup('t'+i, typeOptions, v.type, `${updateFn}_type_${i}`)}
+      </div>
+      <div class="vh-grid" style="margin-top:10px;">
+        <div><label>รุ่น</label><input type="text" value="${v.model||''}" oninput="${updateFn}(${i},'model',this.value)"></div>
+        <div><label>สี</label><input type="text" value="${v.color||''}" oninput="${updateFn}(${i},'color',this.value)"></div>
+        <div class="full"><label>ทะเบียน / เลขครุภัณฑ์ (ถ้ามี)</label><input type="text" value="${v.plate||''}" oninput="${updateFn}(${i},'plate',this.value)"></div>
+      </div>
+    </div>
+  `).join('') + `<button class="btn-add" onclick="${addFn}">+ เพิ่มคัน</button>`;
+}
+
+/* ======================= PERSONAL FORM ======================= */
+function renderPersonal(){
+  const f = personalForm;
+  let body = '';
+
+  if(f.step===1){
+    body = `
+    <div class="section-card">
+      <div class="section-title">ส่วนที่ 1 · ข้อมูลผู้ตอบแบบสอบถาม</div>
+      <div class="section-sub">กรอกรหัสประจำตัวเพื่อดึงชื่อและหน่วยงานของท่านโดยอัตโนมัติ</div>
+      <div class="field">
+        <label>รหัสประจำตัว</label>
+        <div class="lookup-row">
+          <input type="text" id="pid-input" placeholder="เช่น 123" value="${f.id}" inputmode="numeric">
+          <button class="btn-lookup" onclick="lookupPerson()">ค้นหา</button>
+        </div>
+        <div class="autofill-box ${f.person?'show':''}" id="pid-box">
+          ${f.person?`<div class="row"><span>ชื่อ-นามสกุล</span><span>${f.person.prefix}${f.person.fname} ${f.person.lname}</span></div>
+          <div class="row"><span>หน่วยงาน</span><span>${f.person.dept}</span></div>`:''}
+        </div>
+        <div class="msg error" id="pid-msg"></div>
+      </div>
+    </div>`;
+  }
+
+  if(f.step===2){
+    body = `
+    <div class="section-card">
+      <div class="section-title">ส่วนที่ 2 · ข้อมูลยานพาหนะไฟฟ้า (EV)</div>
+      <div class="section-sub">5. ปัจจุบันท่านมียานพาหนะไฟฟ้า (EV) ส่วนบุคคลหรือไม่</div>
+      ${choiceGroup('hasEV',['มี','ไม่มี'], f.hasEV, 'setPersonalHasEV')}
+    </div>`;
+  }
+
+  if(f.step===3){
+    body = `
+    <div class="section-card">
+      <div class="section-title">6. ประเภทและจำนวนยานพาหนะไฟฟ้าส่วนบุคคล</div>
+      <div class="section-sub">กรอก 1 รายการต่อ 1 คัน หากมีมากกว่า 1 คัน กด "เพิ่มคัน" ได้</div>
+      ${vehicleRows(f.vehicles, ['รถยนต์ไฟฟ้า (EV)','รถจักรยานยนต์ไฟฟ้า (EV)'], 'addPersonalVehicle()','removePersonalVehicle','updatePersonalVehicle')}
+    </div>`;
+  }
+
+  if(f.step===4){
+    body = `
+    <div class="section-card">
+      <div class="section-title">7. การนำรถ EV มาปฏิบัติงาน</div>
+      <div class="section-sub">โดยปกติท่านนำรถ EV มาปฏิบัติงานที่โรงพยาบาลบึงกาฬหรือไม่</div>
+      ${choiceGroup('bw',['เป็นประจำ','บางครั้ง','ไม่เคย'], f.bringToWork, 'setPersonalBW')}
+    </div>
+    <div class="section-card">
+      <div class="section-title">8. ความต้องการใช้สถานีชาร์จ</div>
+      <div class="section-sub">หากโรงพยาบาลมีสถานีชาร์จ EV ท่านมีความประสงค์จะใช้บริการหรือไม่</div>
+      ${choiceGroup('wc',['ใช้','ไม่ใช้','ยังไม่แน่ใจ'], f.wantCharging, 'setPersonalWC')}
+    </div>
+    <div class="section-card">
+      <div class="section-title">9. ข้อเสนอแนะเพิ่มเติม</div>
+      <div class="field"><textarea id="p-suggestion" placeholder="(ไม่บังคับ)" oninput="personalForm.suggestion=this.value">${f.suggestion}</textarea></div>
+    </div>`;
+  }
+
+  if(f.step===5){
+    body = `
+    <div class="confirm-card">
+      ${ICONS.check}
+      <h3>ส่งแบบสำรวจเรียบร้อยแล้ว</h3>
+      <p>ขอบคุณสำหรับข้อมูลของท่าน ข้อมูลถูกบันทึกลงระบบเรียบร้อยแล้ว</p>
+      <button class="btn btn-primary" style="margin-top:16px;width:100%;" onclick="goHome()">กลับสู่หน้าแรก</button>
+    </div>`;
+  }
+
+  const totalSteps = 4;
+  const showBattery = f.step<=4;
+
+  return `
+  ${pageHead('ยานพาหนะไฟฟ้าส่วนบุคคล', f.step===1?'goHome()':'personalBack()')}
+  ${showBattery ? battery(f.step, totalSteps, `ขั้นตอน ${f.step}/${totalSteps}`) : ''}
+  ${body}
+  ${renderPersonalBottomBar()}
+  `;
+}
+
+function renderPersonalBottomBar(){
+  const f = personalForm;
+  if(f.step===5){
+    return '';
+  }
+  let nextLabel = 'ถัดไป';
+  let nextFn = 'personalNext()';
+  if(f.step===2 && f.hasEV==='ไม่มี'){ nextLabel='ยืนยันส่งข้อมูล'; nextFn='personalSubmit()'; }
+  if(f.step===4){ nextLabel='ส่งแบบสำรวจ'; nextFn='personalSubmit()'; }
+  return `<div class="bottom-bar"><div class="bottom-bar-inner">
+    <button class="btn btn-primary" id="p-next-btn" onclick="${nextFn}">${nextLabel}</button>
+  </div></div>`;
+}
+
+function personalBack(){
+  const f = personalForm;
+  if(f.step===3) f.step=2;
+  else if(f.step===4) f.step = f.vehicles.length? 3:2;
+  else if(f.step>1) f.step--;
+  else view='home';
+  render();
+}
+
+function lookupPerson(){
+  const val = document.getElementById('pid-input').value.trim();
+  personalForm.id = val;
+  const msg = document.getElementById('pid-msg');
+  if(!val){ msg.textContent='กรุณากรอกรหัสประจำตัว'; msg.classList.add('show'); return; }
+  const p = findPerson(val);
+  if(!p){
+    personalForm.person=null;
+    msg.textContent='ไม่พบรหัสประจำตัวนี้ในระบบ กรุณาตรวจสอบอีกครั้ง';
+    msg.classList.add('show');
+    document.getElementById('pid-box').classList.remove('show');
+    return;
+  }
+  if(remoteData.personalIds.includes(String(p.id))){
+    personalForm.person=null;
+    msg.textContent='รหัสนี้ได้ส่งแบบสำรวจไปแล้ว ไม่สามารถส่งซ้ำได้';
+    msg.classList.add('show');
+    document.getElementById('pid-box').classList.remove('show');
+    return;
+  }
+  msg.classList.remove('show');
+  personalForm.person = p;
+  render();
+}
+
+function personalNext(){
+  const f = personalForm;
+  if(f.step===1){
+    if(!f.person){ lookupPerson(); return; }
+    f.step=2; render(); return;
+  }
+  if(f.step===2){
+    if(!f.hasEV){ alert('กรุณาเลือกคำตอบ'); return; }
+    if(f.hasEV==='ไม่มี'){ return; }
+    if(f.vehicles.length===0) f.vehicles.push({type:'รถยนต์ไฟฟ้า (EV)',model:'',color:'',plate:''});
+    f.step=3; render(); return;
+  }
+  if(f.step===3){
+    f.step=4; render(); return;
+  }
+}
+
+function setPersonalHasEV(val){ personalForm.hasEV=val; render(); }
+function addPersonalVehicle(){ personalForm.vehicles.push({type:'รถยนต์ไฟฟ้า (EV)',model:'',color:'',plate:''}); render(); }
+function removePersonalVehicle(i){ personalForm.vehicles.splice(i,1); render(); }
+function updatePersonalVehicle(i,key,val){ personalForm.vehicles[i][key]=val; }
+window.updatePersonalVehicle_type_0 = null;
+// dynamic type setter proxy
+for(let i=0;i<50;i++){
+  window['updatePersonalVehicle_type_'+i] = (function(idx){ return function(val){ personalForm.vehicles[idx].type=val; render(); }; })(i);
+}
+function setPersonalBW(val){ personalForm.bringToWork=val; render(); }
+function setPersonalWC(val){ personalForm.wantCharging=val; render(); }
+
+async function personalSubmit(){
+  const f = personalForm;
+  if(f.hasEV==='มี'){
+    if(!f.bringToWork || !f.wantCharging){ alert('กรุณาตอบคำถามให้ครบทุกข้อ'); return; }
+    f.suggestion = document.getElementById('p-suggestion') ? document.getElementById('p-suggestion').value : f.suggestion;
+  }
+  const btn = document.getElementById('p-next-btn');
+  if(btn){ btn.disabled=true; btn.textContent='กำลังส่งข้อมูล...'; }
+
+  const payload = {
+    formType:'personal',
+    id: f.person.id,
+    dept: f.person.dept,
+    name: f.person.prefix + f.person.fname + ' ' + f.person.lname,
+    hasEV: f.hasEV,
+    vehicles: f.hasEV==='มี' ? f.vehicles : [],
+    vehiclesText: f.hasEV==='มี' ? vehiclesToText(f.vehicles) : '',
+    bringToWork: f.hasEV==='มี' ? f.bringToWork : '',
+    wantCharging: f.hasEV==='มี' ? f.wantCharging : '',
+    suggestion: f.suggestion || ''
+  };
+
+  try{
+    const result = await postForm(payload);
+    if(result.status==='duplicate'){
+      alert('รหัสนี้ได้ส่งแบบสำรวจไปแล้ว');
+      goHome(); return;
+    }
+    remoteData.personalIds.push(String(f.person.id));
+    f.step=5; render();
+  }catch(err){
+    alert('ส่งข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+    if(btn){ btn.disabled=false; btn.textContent='ส่งแบบสำรวจ'; }
+  }
+}
+
+/* ======================= DEPARTMENT FORM ======================= */
+function renderDepartment(){
+  const f = deptForm;
+  let body = '';
+
+  if(f.step===1){
+    body = `
+    <div class="section-card">
+      <div class="section-title">ส่วนที่ 1 · ข้อมูลหน่วยงาน</div>
+      <div class="section-sub">กรอกรหัสต้นทุนของหน่วยงานเพื่อดึงชื่อหน่วยงานโดยอัตโนมัติ</div>
+      <div class="field">
+        <label>รหัสต้นทุนของหน่วยงาน</label>
+        <div class="lookup-row">
+          <input type="text" id="code-input" placeholder="เช่น A0101" value="${f.code}">
+          <button class="btn-lookup" onclick="lookupDept()">ค้นหา</button>
+        </div>
+        <div class="autofill-box ${f.center?'show':''}" id="code-box">
+          ${f.center?`<div class="row"><span>ชื่อหน่วยงาน</span><span>${f.center.name}</span></div>`:''}
+        </div>
+        <div class="msg error" id="code-msg"></div>
+      </div>
+      ${f.center?`
+      <div class="field"><label>ผู้ส่งข้อมูล</label><input type="text" id="d-submitter" value="${f.submitterName}" placeholder="ชื่อ-นามสกุล" oninput="deptForm.submitterName=this.value"></div>
+      <div class="field"><label>ตำแหน่ง</label><input type="text" id="d-position" value="${f.position}" placeholder="ตำแหน่ง" oninput="deptForm.position=this.value"></div>
+      <div class="field"><label>เบอร์โทรศัพท์ติดต่อภายใน</label><input type="tel" id="d-phone" value="${f.phone}" placeholder="เบอร์ภายใน" oninput="deptForm.phone=this.value"></div>
+      `:''}
+    </div>`;
+  }
+
+  if(f.step===2){
+    body = `
+    <div class="section-card">
+      <div class="section-title">ส่วนที่ 2 · ข้อมูลยานพาหนะไฟฟ้าของหน่วยงาน</div>
+      <div class="section-sub">5. หน่วยงานของท่านมียานพาหนะไฟฟ้าหรือไม่</div>
+      ${choiceGroup('hasEV',['มี','ไม่มี'], f.hasEV, 'setDeptHasEV')}
+    </div>`;
+  }
+
+  if(f.step===3){
+    body = `
+    <div class="section-card">
+      <div class="section-title">6. ประเภทและจำนวนยานพาหนะไฟฟ้าของหน่วยงาน</div>
+      <div class="section-sub">กรอก 1 รายการต่อ 1 คัน หากมีมากกว่า 1 คัน กด "เพิ่มคัน" ได้</div>
+      ${vehicleRows(f.vehicles, ['รถจักรยานยนต์ไฟฟ้า','รถไฟฟ้า 4 ล้อบรรทุก'], 'addDeptVehicle()','removeDeptVehicle','updateDeptVehicle')}
+    </div>`;
+  }
+
+  if(f.step===4){
+    body = `
+    <div class="section-card">
+      <div class="section-title">7. การนำยานพาหนะมาปฏิบัติงาน</div>
+      <div class="section-sub">โดยปกติหน่วยงานของท่านนำยานพาหนะไฟฟ้ามาปฏิบัติงานหรือไม่</div>
+      ${choiceGroup('bw',['เป็นประจำ','บางครั้ง','ไม่เคย'], f.bringToWork, 'setDeptBW')}
+    </div>
+    <div class="section-card">
+      <div class="section-title">8. ความต้องการใช้สถานีชาร์จ</div>
+      <div class="section-sub">หากโรงพยาบาลมีสถานีชาร์จยานพาหนะไฟฟ้า ท่านมีความประสงค์จะใช้บริการหรือไม่</div>
+      ${choiceGroup('wc',['ใช้','ไม่ใช้','ยังไม่แน่ใจ'], f.wantCharging, 'setDeptWC')}
+    </div>
+    <div class="section-card">
+      <div class="section-title">9. ข้อเสนอแนะเพิ่มเติม</div>
+      <div class="field"><textarea id="d-suggestion" placeholder="(ไม่บังคับ)" oninput="deptForm.suggestion=this.value">${f.suggestion}</textarea></div>
+    </div>`;
+  }
+
+  if(f.step===5){
+    body = `
+    <div class="confirm-card">
+      ${ICONS.check}
+      <h3>ส่งแบบสำรวจเรียบร้อยแล้ว</h3>
+      <p>ขอบคุณสำหรับข้อมูลของหน่วยงานท่าน ข้อมูลถูกบันทึกลงระบบเรียบร้อยแล้ว</p>
+      <button class="btn btn-primary" style="margin-top:16px;width:100%;" onclick="goHome()">กลับสู่หน้าแรก</button>
+    </div>`;
+  }
+
+  const totalSteps=4;
+  const showBattery = f.step<=4;
+
+  return `
+  ${pageHead('ยานพาหนะไฟฟ้าของหน่วยงาน', f.step===1?'goHome()':'deptBack()')}
+  ${showBattery ? battery(f.step, totalSteps, `ขั้นตอน ${f.step}/${totalSteps}`) : ''}
+  ${body}
+  ${renderDeptBottomBar()}
+  `;
+}
+
+function renderDeptBottomBar(){
+  const f = deptForm;
+  if(f.step===5){
+    return '';
+  }
+  let nextLabel='ถัดไป'; let nextFn='deptNext()';
+  if(f.step===2 && f.hasEV==='ไม่มี'){ nextLabel='ยืนยันส่งข้อมูล'; nextFn='deptSubmit()'; }
+  if(f.step===4){ nextLabel='ส่งแบบสำรวจ'; nextFn='deptSubmit()'; }
+  return `<div class="bottom-bar"><div class="bottom-bar-inner">
+    <button class="btn btn-primary" id="d-next-btn" onclick="${nextFn}">${nextLabel}</button>
+  </div></div>`;
+}
+
+function deptBack(){
+  const f = deptForm;
+  if(f.step===3) f.step=2;
+  else if(f.step===4) f.step = f.vehicles.length? 3:2;
+  else if(f.step>1) f.step--;
+  else view='home';
+  render();
+}
+
+function lookupDept(){
+  const val = document.getElementById('code-input').value.trim();
+  deptForm.code = val;
+  const msg = document.getElementById('code-msg');
+  if(!val){ msg.textContent='กรุณากรอกรหัสต้นทุน'; msg.classList.add('show'); return; }
+  const c = findCostCenter(val);
+  if(!c){
+    deptForm.center=null;
+    msg.textContent='ไม่พบรหัสต้นทุนนี้ในระบบ กรุณาตรวจสอบอีกครั้ง';
+    msg.classList.add('show');
+    return;
+  }
+  if(remoteData.deptCodes.includes(String(c.code))){
+    deptForm.center=null;
+    msg.textContent='หน่วยงานนี้ได้ส่งแบบสำรวจไปแล้ว ไม่สามารถส่งซ้ำได้';
+    msg.classList.add('show');
+    return;
+  }
+  msg.classList.remove('show');
+  deptForm.center = c;
+  render();
+}
+
+function deptNext(){
+  const f = deptForm;
+  if(f.step===1){
+    if(!f.center){ lookupDept(); return; }
+    f.submitterName = document.getElementById('d-submitter').value.trim();
+    f.position = document.getElementById('d-position').value.trim();
+    f.phone = document.getElementById('d-phone').value.trim();
+    if(!f.submitterName || !f.position){ alert('กรุณากรอกผู้ส่งข้อมูลและตำแหน่งให้ครบถ้วน'); return; }
+    f.step=2; render(); return;
+  }
+  if(f.step===2){
+    if(!f.hasEV){ alert('กรุณาเลือกคำตอบ'); return; }
+    if(f.hasEV==='ไม่มี'){ return; }
+    if(f.vehicles.length===0) f.vehicles.push({type:'รถจักรยานยนต์ไฟฟ้า',model:'',color:'',plate:''});
+    f.step=3; render(); return;
+  }
+  if(f.step===3){ f.step=4; render(); return; }
+}
+
+function setDeptHasEV(val){ deptForm.hasEV=val; render(); }
+function addDeptVehicle(){ deptForm.vehicles.push({type:'รถจักรยานยนต์ไฟฟ้า',model:'',color:'',plate:''}); render(); }
+function removeDeptVehicle(i){ deptForm.vehicles.splice(i,1); render(); }
+function updateDeptVehicle(i,key,val){ deptForm.vehicles[i][key]=val; }
+for(let i=0;i<50;i++){
+  window['updateDeptVehicle_type_'+i] = (function(idx){ return function(val){ deptForm.vehicles[idx].type=val; render(); }; })(i);
+}
+function setDeptBW(val){ deptForm.bringToWork=val; render(); }
+function setDeptWC(val){ deptForm.wantCharging=val; render(); }
+
+async function deptSubmit(){
+  const f = deptForm;
+  if(f.hasEV==='มี'){
+    if(!f.bringToWork || !f.wantCharging){ alert('กรุณาตอบคำถามให้ครบทุกข้อ'); return; }
+  }
+  const suggestionEl = document.getElementById('d-suggestion');
+  if(suggestionEl) f.suggestion = suggestionEl.value;
+
+  const btn = document.getElementById('d-next-btn');
+  if(btn){ btn.disabled=true; btn.textContent='กำลังส่งข้อมูล...'; }
+
+  const payload = {
+    formType:'department',
+    costCode: f.center.code,
+    deptName: f.center.name,
+    submitterName: f.submitterName,
+    position: f.position,
+    phone: f.phone,
+    hasEV: f.hasEV,
+    vehicles: f.hasEV==='มี' ? f.vehicles : [],
+    vehiclesText: f.hasEV==='มี' ? vehiclesToText(f.vehicles) : '',
+    bringToWork: f.hasEV==='มี' ? f.bringToWork : '',
+    wantCharging: f.hasEV==='มี' ? f.wantCharging : '',
+    suggestion: f.suggestion || ''
+  };
+
+  try{
+    const result = await postForm(payload);
+    if(result.status==='duplicate'){
+      alert('หน่วยงานนี้ได้ส่งแบบสำรวจไปแล้ว');
+      goHome(); return;
+    }
+    remoteData.deptCodes.push(String(f.center.code));
+    f.step=5; render();
+  }catch(err){
+    alert('ส่งข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่');
+    if(btn){ btn.disabled=false; btn.textContent='ส่งแบบสำรวจ'; }
+  }
+}
+
+/* ======================= DEPARTMENT SUMMARY (public) ======================= */
+function renderDeptSummary(){
+  const total = COSTCENTERS.length;
+  const submitted = remoteData.deptCodes.filter(c => COSTCENTERS.some(cc=>cc.code===c)).length;
+  const pct = total? Math.round((submitted/total)*1000)/10 : 0;
+
+  const rows = COSTCENTERS.map(c=>{
+    const done = remoteData.deptCodes.includes(c.code);
+    return `<div class="dept-row">
+      <div class="check ${done?'yes':'no'}">${done?ICONS.check:ICONS.x}</div>
+      <div class="info"><div class="dname">${c.name}</div><div class="dcount">รหัส ${c.code}</div></div>
+    </div>`;
+  }).join('');
+
+  return `
+  ${pageHead('สรุปผล · หน่วยงาน', 'goHome()')}
+  ${!remoteData.loaded && !remoteData.error ? `<div class="empty-state"><div class="spinner"></div><div style="margin-top:10px;">กำลังโหลดข้อมูล...</div></div>` : ''}
+  ${remoteData.error==='noconfig' ? `<div class="setup-note"><b>ยังไม่เชื่อมต่อ Google Sheet</b>ยังไม่มีข้อมูลให้สรุปผล เนื่องจากยังไม่ได้ตั้งค่า Web app URL</div>`:''}
+  ${remoteData.loaded ? `
+  <div class="stat-hero">
+    <div class="big">${pct}%</div>
+    <div class="cap">หน่วยงานที่ส่งแบบสำรวจแล้ว</div>
+    <div class="sub">${submitted} จาก ${total} หน่วยงาน (อ้างอิงรายชื่อหน่วยต้นทุน) · อัปเดตแบบเรียลไทม์</div>
+  </div>
+  <div class="section-card">
+    <div class="section-title">รายชื่อหน่วยงานทั้งหมด</div>
+    ${rows}
+  </div>
+  `:''}
+  `;
+}
+
+/* ======================= PERSONAL SUMMARY (password) ======================= */
+function renderPersonalSummary(){
+  if(!summaryPwOk){
+    return `
+    ${pageHead('สรุปผล · รายบุคคล', 'goHome()')}
+    <div class="section-card">
+      <div class="password-gate">
+        <div class="lock">${ICONS.lock}</div>
+        <div class="section-title" style="justify-content:center;">กรุณากรอกรหัสผ่าน</div>
+        <div class="section-sub">หน้านี้จำกัดเฉพาะผู้ดูแลระบบ</div>
+        <input type="text" id="pw-input" placeholder="รหัสผ่าน" value="${pwInput}">
+        <div class="msg error" id="pw-msg"></div>
+      </div>
+    </div>
+    <div class="bottom-bar"><div class="bottom-bar-inner">
+      <button class="btn btn-primary" onclick="checkPassword()">ยืนยัน</button>
+    </div></div>
+    `;
+  }
+
+  const totalPeople = PEOPLE.length;
+  const submittedIds = remoteData.personalIds.filter(id=>PEOPLE.some(p=>p.id===id));
+  const submittedCount = submittedIds.length;
+  const pct = totalPeople? Math.round((submittedCount/totalPeople)*1000)/10 : 0;
+
+  const deptStats = DEPT_TOTALS.map(d=>{
+    const submittedInDept = PEOPLE.filter(p=>p.dept===d.name && submittedIds.includes(p.id)).length;
+    const t = d.total || 0;
+    const p = t? Math.round((submittedInDept/t)*1000)/10 : 0;
+    return {name:d.name, submitted:submittedInDept, total:t, pct:p};
+  }).sort((a,b)=>b.pct-a.pct);
+
+  const rows = deptStats.map(d=>`
+    <div class="dept-row">
+      <div class="info">
+        <div class="dname">${d.name}</div>
+        <div class="dcount">${d.submitted} / ${d.total} คน</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(d.pct,100)}%"></div></div>
+      </div>
+      <div class="pct">${d.pct}%</div>
+    </div>
+  `).join('');
+
+  return `
+  ${pageHead('สรุปผล · รายบุคคล', 'goHome()')}
+  ${!remoteData.loaded && !remoteData.error ? `<div class="empty-state"><div class="spinner"></div><div style="margin-top:10px;">กำลังโหลดข้อมูล...</div></div>` : ''}
+  ${remoteData.error==='noconfig' ? `<div class="setup-note"><b>ยังไม่เชื่อมต่อ Google Sheet</b>ยังไม่มีข้อมูลให้สรุปผล เนื่องจากยังไม่ได้ตั้งค่า Web app URL</div>`:''}
+  ${remoteData.loaded ? `
+  <div class="stat-hero">
+    <div class="big">${pct}%</div>
+    <div class="cap">บุคลากรที่ส่งแบบสำรวจแล้ว</div>
+    <div class="sub">${submittedCount} จาก ${totalPeople} คน · อัปเดตแบบเรียลไทม์</div>
+  </div>
+  <div class="section-card">
+    <div class="section-title">สัดส่วนตามหน่วยงาน</div>
+    ${rows}
+  </div>
+  `:''}
+  `;
+}
+
+function checkPassword(){
+  const val = document.getElementById('pw-input').value;
+  pwInput = val;
+  if(val === CONFIG.SUMMARY_PASSWORD){
+    summaryPwOk = true; render();
+  } else {
+    document.getElementById('pw-msg').textContent = 'รหัสผ่านไม่ถูกต้อง';
+    document.getElementById('pw-msg').classList.add('show');
+  }
+}
+
+/* ======================= EVENT DELEGATION HELPERS ======================= */
+function attachHandlers(){
+  const pidInput = document.getElementById('pid-input');
+  if(pidInput){ pidInput.addEventListener('keydown', e=>{ if(e.key==='Enter') lookupPerson(); }); }
+  const codeInput = document.getElementById('code-input');
+  if(codeInput){ codeInput.addEventListener('keydown', e=>{ if(e.key==='Enter') lookupDept(); }); }
+  const pwInputEl = document.getElementById('pw-input');
+  if(pwInputEl){ pwInputEl.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPassword(); }); }
+}
+
+/* ======================= INIT ======================= */
+render();
+loadRemoteData();
+</script>
+</body>
+</html>
